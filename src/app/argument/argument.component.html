@@ -1,0 +1,120 @@
+<mat-card style="border: 1px solid grey; height: 100%">
+  <mat-card-content>
+    <div style="height: 100%">
+      <mat-horizontal-stepper [linear]="false" #stepper>
+        <mat-step [stepControl]="topicForm" label="The topic of debate">
+          <form [formGroup]="topicForm">
+            <ng-template matStepLabel>The Topic of Debate</ng-template>
+            <div class="row form-group">
+              <quill-editor
+                formControlName="topic"
+                (onEditorChanged)="onTopicChange($event)"
+              ></quill-editor>
+            </div>
+          </form>
+          <div class="margin-top">
+            <button mat-button matStepperNext>Next</button>
+          </div>
+        </mat-step>
+        <mat-step [stepControl]="personForm">
+          <form [formGroup]="personForm" class="form-group">
+            <ng-template matStepLabel>Names</ng-template>
+            <div class="row"><mat-label>First challenger</mat-label></div>
+            <div class="row">
+              <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="personA" required />
+                <mat-error>This field is required</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="row"><mat-label>Second challenger</mat-label></div>
+
+            <div class="row">
+              <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="personB" required />
+                <mat-error>This field is required</mat-error>
+              </mat-form-field>
+            </div>
+            <div>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step [stepControl]="argumentForm" label="First Analysis">
+          <form [formGroup]="argumentForm">
+            <div class="margin">
+              <mat-label>First Challenger's Opinion</mat-label>
+            </div>
+            <div>
+              <quill-editor formControlName="argumentA"></quill-editor>
+            </div>
+            <div class="margin">
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step [stepControl]="argumentForm" label="Second Analysis">
+          <form [formGroup]="argumentForm">
+            <div class="margin">
+              <mat-label>Second Challenger's Opinion</mat-label>
+            </div>
+            <div>
+              <quill-editor formControlName="argumentB"></quill-editor>
+            </div>
+            <div class="margin">
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Done</ng-template>
+          <form [formGroup]="contactsForm">
+            <div class="row">
+              <div class="col-12">
+                <mat-label>Voters</mat-label>
+              </div>
+            </div>
+            <div
+              class="row"
+              *ngFor="
+                let control of Object.keys(contactsForm.controls);
+                let i = index;
+                let last = last;
+                let first = first
+              "
+            >
+              <div class="col">
+                <mat-form-field appearance="outline">
+                  <mat-label>Email</mat-label>
+                  <input matInput [formControlName]="'contact' + i" />
+                  <mat-error>This field is required</mat-error>
+                  <button mat-button matSuffix (click)="addEmail(i + 1)">
+                    <mat-icon *ngIf="last">add</mat-icon>
+                  </button>
+                </mat-form-field>
+                <button mat-button>
+                  <mat-icon
+                    *ngIf="!first && last"
+                    class="delete-icon"
+                    (click)="deleteEmail(i)"
+                    >delete</mat-icon
+                  >
+                </button>
+              </div>
+            </div>
+          </form>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button (click)="submit()">Submit</button>
+          </div>
+        </mat-step>
+      </mat-horizontal-stepper>
+    </div>
+  </mat-card-content>
+</mat-card>
