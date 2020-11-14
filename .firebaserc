@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "told-ya"
+  },
+  "targets": {
+    "told-ya": {
+      "hosting": {
+        "told-ya": [
+          "told-ya"
+        ]
+      }
+    }
+  }
+}

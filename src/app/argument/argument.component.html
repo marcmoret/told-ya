@@ -48,7 +48,10 @@
               <mat-label>First Challenger's Opinion</mat-label>
             </div>
             <div>
-              <quill-editor formControlName="argumentA"></quill-editor>
+              <quill-editor
+                formControlName="argumentA"
+                (onEditorChanged)="onArgueA($event)"
+              ></quill-editor>
             </div>
             <div class="margin">
               <button mat-button matStepperPrevious>Back</button>
@@ -63,7 +66,10 @@
               <mat-label>Second Challenger's Opinion</mat-label>
             </div>
             <div>
-              <quill-editor formControlName="argumentB"></quill-editor>
+              <quill-editor
+                formControlName="argumentB"
+                (onEditorChanged)="onArgueB($event)"
+              ></quill-editor>
             </div>
             <div class="margin">
               <button mat-button matStepperPrevious>Back</button>
@@ -90,19 +96,43 @@
               "
             >
               <div class="col">
-                <mat-form-field appearance="outline">
-                  <mat-label>Email</mat-label>
-                  <input matInput [formControlName]="'contact' + i" />
-                  <mat-error>This field is required</mat-error>
-                  <button mat-button matSuffix (click)="addEmail(i + 1)">
-                    <mat-icon *ngIf="last">add</mat-icon>
-                  </button>
+                <mat-form-field appearance="outline" class="margin-left-form">
+                  <mat-label>Phone Number</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    [formControlName]="'contact' + i"
+                  />
+                  <mat-error
+                    *ngIf="
+                      contactsForm.controls['contact' + i]?.errors?.required
+                    "
+                    >This field is required</mat-error
+                  >
+                  <mat-error
+                    *ngIf="contactsForm.controls['contact' + i]?.errors?.max"
+                    >Too many numbers entered</mat-error
+                  >
+                  <mat-error
+                    *ngIf="contactsForm.controls['contact' + i]?.errors?.min"
+                    >Missing numbers</mat-error
+                  >
+                  <mat-error
+                    *ngIf="
+                      contactsForm.controls['contact' + i]?.errors?.pattern
+                    "
+                    >Only numbers are allowed</mat-error
+                  >
                 </mat-form-field>
-                <button mat-button>
-                  <mat-icon
-                    *ngIf="!first && last"
-                    class="delete-icon"
-                    (click)="deleteEmail(i)"
+                <button
+                  mat-button
+                  (click)="addPhone(i + 1)"
+                  class="margin-left"
+                >
+                  <mat-icon *ngIf="last">add</mat-icon>
+                </button>
+                <button mat-button (click)="deletePhone(i)" class="margin-left">
+                  <mat-icon *ngIf="!first && last" class="delete-icon"
                     >delete</mat-icon
                   >
                 </button>
