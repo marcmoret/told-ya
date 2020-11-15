@@ -20,11 +20,13 @@ export const sendSms = functions.https.onRequest((req, res) => {
     const numbers = data.numbers;
 
     const results = [];
+    let msgCounter = 0;
 
     for (const number of numbers) {
+      msgCounter++;
       await client.messages
         .create({
-          body: message,
+          body: `${message}${msgCounter}`,
           from: '+14387943264',
           to: number,
         })

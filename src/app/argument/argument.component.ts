@@ -6,7 +6,7 @@ import {
   FormControl,
 } from '@angular/forms';
 import { Argument } from 'model/arguement.model';
-import { ArguementService } from 'src/api/arguement.service';
+import { ArgumentService } from 'src/api/argument.service';
 
 export class MyTel {
   constructor(
@@ -37,7 +37,7 @@ export class ArgumentComponent implements OnInit {
 
   constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly arguementService: ArguementService
+    private readonly arguementService: ArgumentService
   ) {
     this.personForm = this.formBuilder.group({
       personA: ['', [Validators.required]],
@@ -125,19 +125,24 @@ export class ArgumentComponent implements OnInit {
       const message = `
       Hey!
 ${personA} and ${personB} need you to settle an argument. Click the link below and vote who you think is right!
-{{link}} `;
+{{link}}`;
 
       const argument: Argument = {
         topic: topic,
         personA: personA,
         argumentA: argumentA,
+        votesA: 0,
         personB: personB,
         argumentB: argumentB,
+        votesB: 0,
         numbers: numbers,
         message: message,
+        createdDate: new Date(),
       };
 
-      console.log(argument);
+      numbers.forEach((number, i) => {
+        argument[`voter${i + 1}`] = false;
+      });
 
       this.arguementService.submitArgument(argument);
     }

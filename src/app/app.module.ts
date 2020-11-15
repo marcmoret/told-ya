@@ -17,6 +17,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 import { PhoneInputComponent } from './phone-input/phone-input.component';
 import { VotingComponent } from './voting/voting.component';
+import { CastVoteComponent } from './voting/cast-vote/cast-vote.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { VotingComponent } from './voting/voting.component';
     MainComponent,
     VotingComponent,
     ArgumentComponent,
+    CastVoteComponent,
     PhoneInputComponent,
   ],
   imports: [

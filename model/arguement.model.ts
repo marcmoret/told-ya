@@ -5,6 +5,9 @@ export interface Argument {
   personB: string;
   argumentA: string;
   argumentB: string;
+  votesA: number;
+  votesB: number;
   topic: string;
   message: string;
+  createdDate: Date;
 }

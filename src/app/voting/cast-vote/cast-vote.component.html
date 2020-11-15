@@ -1,0 +1,11 @@
+<h3>Time to cast your vote!</h3>
+<div class="row">
+  <div class="col-6">
+    <h4>{{argument?.personA}}</h4>
+    <p>{{argument?.argumentA}}</p>
+    <br>
+    <button mat-button (click)="castVote('A')">Vote</button>
+    <mat-spinner *ngIf="loadingA" [diameter]="25"></mat-spinner>
+  </div>
+  <div class="col-6">test</div>
+</div>
