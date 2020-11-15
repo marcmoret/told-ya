@@ -47,14 +47,24 @@ export class ArgumentService {
     return this.db.doc(`arguments/${id}`).get().toPromise();
   }
 
-  castVote(voterId: string, voteTotal: number, docId: string, person) {
+  async castVote(voterId: string, voteTotal: number, docId: string, person) {
     const voter = `voter${voterId}`;
     const votes = `votes${person}`;
-    console.log(voter);
 
-    this.db.doc(`${collection}/${docId}`).update({
+    return this.db.doc(`${collection}/${docId}`).update({
       [voter]: true,
       [votes]: voteTotal,
     });
+  }
+
+  async verifyVoter(id: string, voterId: string) {
+    let result;
+    const docRef = this.db.doc(`${collection}/${id}`).get();
+
+    await docRef.toPromise().then((documentSnap) => {
+      result = documentSnap.data();
+      console.log(documentSnap.data());
+    });
+    return result;
   }
 }

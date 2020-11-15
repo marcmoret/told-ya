@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Argument } from 'model/arguement.model';
 import { ArgumentService } from 'src/api/argument.service';
@@ -12,6 +12,9 @@ export class CastVoteComponent implements OnInit {
   @Input() argument: Argument;
   @Input() docId: string;
   @Input() voterId: string;
+  @Output()
+  castVoted = new EventEmitter();
+
   loadingA = false;
   loadingB = false;
 
@@ -29,6 +32,16 @@ export class CastVoteComponent implements OnInit {
 
     const voteTotal = this.argument[`votes${person}`];
     console.log(voteTotal);
-    this.argumentService.castVote(this.voterId, voteTotal, this.docId, person);
+    const result = this.argumentService
+      .castVote(this.voterId, voteTotal, this.docId, person)
+      .then((res) => {
+        this.snackService.open('Successfully casted vote!', '', {
+          duration: 3000,
+        });
+        this.castVoted.emit(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }

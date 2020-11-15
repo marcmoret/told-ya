@@ -15,6 +15,7 @@ export class VotingComponent implements OnInit {
   showChart = false;
   docId = '';
   voterId = '';
+  isEligable = true;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -24,22 +25,23 @@ export class VotingComponent implements OnInit {
 
   ngOnInit(): void {
     const param = this.route.snapshot.paramMap.get('id');
-    console.log(param);
-
-    this.setArgument(param);
+    this.docId = param.slice(0, -1);
+    this.voterId = param.slice(param.length - 1);
+    this.getArgument(param);
   }
 
-  async setArgument(id: string) {
-    this.docId = id.slice(0, -1);
-    this.voterId = id.slice(id.length - 1);
-    console.log(this.docId);
-    console.log(this.voterId);
-
-    await this.argumentService.getArgument(this.docId).then((argument) => {
+  getArgument(id: string) {
+    this.argumentService.getArgument(this.docId).then((argument) => {
       this.argument = argument.data();
-      console.log(argument.data());
+      this.verifyVoter();
     });
-    // this.initChart();
+  }
+
+  verifyVoter() {
+    if (this.argument[`voter${this.voterId}`]) {
+      this.isEligable = false;
+      this.initChart();
+    }
   }
 
   initChart() {

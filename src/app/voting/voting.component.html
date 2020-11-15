@@ -1,10 +1,12 @@
 <mat-card style="border: 1px solid grey; height: 100%">
     <mat-card-content>
-        <div style="height: 100%"></div>
         <h1>Voting Booth</h1>
-        <canvas *ngIf="showChart" id="myChart"></canvas>
+        <div [class.display]="isEligable">
+            <canvas id="myChart"></canvas>
+        </div>
         <div>
-            <app-cast-vote [argument]="argument" [docId]="docId" [voterId]="voterId"></app-cast-vote>
+            <app-cast-vote (castVoted)="getArgument()" *ngIf="isEligable" [argument]="argument" [docId]="docId"
+                [voterId]="voterId"></app-cast-vote>
         </div>
     </mat-card-content>
 </mat-card>
