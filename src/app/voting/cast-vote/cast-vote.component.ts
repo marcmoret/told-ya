@@ -29,7 +29,6 @@ export class CastVoteComponent implements OnInit {
 
     const voteTotal = this.argument[`votes${person}`];
     console.log(voteTotal);
-    
     this.argumentService.castVote(this.voterId, voteTotal, this.docId, person);
   }
 }
