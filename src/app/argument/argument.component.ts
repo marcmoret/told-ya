@@ -5,6 +5,7 @@ import {
   Validators,
   FormControl,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Argument } from 'model/arguement.model';
 import { ArgumentService } from 'src/api/argument.service';
 
@@ -37,7 +38,8 @@ export class ArgumentComponent implements OnInit {
 
   constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly arguementService: ArgumentService
+    private readonly arguementService: ArgumentService,
+    private route: Router
   ) {
     this.personForm = this.formBuilder.group({
       personA: ['', [Validators.required]],
@@ -137,6 +139,7 @@ ${personA} and ${personB} need you to settle an argument. Click the link below a
         votesB: 0,
         numbers: numbers,
         message: message,
+        voter0: true,
         createdDate: new Date(),
       };
 
@@ -144,7 +147,9 @@ ${personA} and ${personB} need you to settle an argument. Click the link below a
         argument[`voter${i + 1}`] = false;
       });
 
-      this.arguementService.submitArgument(argument);
+      this.arguementService.submitArgument(argument).then((id) => {
+        this.route.navigateByUrl(`/argument/${id}0`);
+      });
     }
   }
 }

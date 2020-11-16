@@ -7,6 +7,7 @@ export interface Argument {
   argumentB: string;
   votesA: number;
   votesB: number;
+  voter0?: boolean;
   topic: string;
   message: string;
   createdDate: Date;

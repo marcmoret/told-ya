@@ -26,21 +26,24 @@ export class ArgumentService {
     }).toPromise();
   }
 
-  submitArgument(argument: Argument) {
-    this.db
+  async submitArgument(argument: Argument) {
+    let id = '';
+    await this.db
       .collection(collection)
       .add(argument)
       .then((response) => {
         const message = {
           message: argument.message.replace(
             '{{link}}',
-            `told-ya.com/${response.id}`
+            `https://told-ya.web.app/argument/${response.id}`
           ),
           numbers: argument.numbers,
         };
         this.sendSms(message);
+        id = response.id;
         console.log(response.id);
       });
+    return id;
   }
 
   getArgument(id: string): Promise<any> {
