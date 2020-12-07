@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { AngularFirestore, DocumentSnapshot } from '@angular/fire/firestore';
+import { Component, OnInit } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import Chart from 'chart.js';
 import { Argument } from 'model/arguement.model';
@@ -21,13 +21,17 @@ export class VotingComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly db: AngularFirestore,
     private readonly argumentService: ArgumentService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const param = this.route.snapshot.paramMap.get('id');
     this.docId = param.slice(0, -1);
     this.voterId = param.slice(param.length - 1);
     this.getArgument(param);
+    this.db.collection('arguments').doc(this.docId).valueChanges().subscribe((changes: Argument) => {
+      this.argument = changes;
+      this.initChart();
+    });
   }
 
   getArgument(id: string) {

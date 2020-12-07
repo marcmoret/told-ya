@@ -41,7 +41,6 @@ export class ArgumentService {
         };
         this.sendSms(message);
         id = response.id;
-        console.log(response.id);
       });
     return id;
   }
