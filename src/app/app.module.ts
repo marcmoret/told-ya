@@ -12,12 +12,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyMaterialModule } from './MdModule.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireModule } from '@angular/fire/compat';
 import { environment } from '../environments/environment';
 import { PhoneInputComponent } from './phone-input/phone-input.component';
-import { VotingComponent } from './voting/voting.component';
 import { CastVoteComponent } from './voting/cast-vote/cast-vote.component';
+import { VotingComponent } from './voting/voting.component';
 
 @NgModule({
   declarations: [
@@ -25,9 +24,9 @@ import { CastVoteComponent } from './voting/cast-vote/cast-vote.component';
     HeadComponent,
     FooterComponent,
     MainComponent,
-    VotingComponent,
     ArgumentComponent,
     CastVoteComponent,
+    VotingComponent,
     PhoneInputComponent,
   ],
   imports: [
@@ -37,7 +36,7 @@ import { CastVoteComponent } from './voting/cast-vote/cast-vote.component';
     NgbModule,
     BrowserAnimationsModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule,
+    AngularFireModule,
     MyMaterialModule,
     QuillModule.forRoot(),
   ],

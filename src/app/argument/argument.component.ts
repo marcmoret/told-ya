@@ -14,7 +14,7 @@ export class MyTel {
     public area: string,
     public exchange: string,
     public subscriber: string
-  ) {}
+  ) { }
 }
 
 @Component({
@@ -68,7 +68,7 @@ export class ArgumentComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   addPhone(index: number) {
     this.contactsForm.addControl(`contact${index}`, new FormControl(''));

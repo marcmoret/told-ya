@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import {
   AngularFirestore,
-  DocumentData,
-  DocumentSnapshot,
-} from '@angular/fire/firestore';
-import { AngularFireFunctions } from '@angular/fire/functions';
+} from '@angular/fire/compat/firestore';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { Argument } from 'model/arguement.model';
+import { firstValueFrom } from 'rxjs';
 
 const collection = 'arguments';
 
@@ -16,14 +15,14 @@ export class ArgumentService {
   constructor(
     private readonly functions: AngularFireFunctions,
     private readonly db: AngularFirestore
-  ) {}
+  ) { }
 
-  sendSms(message): Promise<any> {
+  sendSms(message) {
     const sendSmsRequest = this.functions.httpsCallable('sendSms');
-    return sendSmsRequest({
+    firstValueFrom(sendSmsRequest({
       message: message.message,
       numbers: message.numbers,
-    }).toPromise();
+    }));
   }
 
   async submitArgument(argument: Argument) {
@@ -46,7 +45,7 @@ export class ArgumentService {
   }
 
   getArgument(id: string): Promise<any> {
-    return this.db.doc(`arguments/${id}`).get().toPromise();
+    return firstValueFrom(this.db.doc(`arguments/${id}`).get());
   }
 
   async castVote(voterId: string, voteTotal: number, docId: string, person) {
@@ -63,7 +62,7 @@ export class ArgumentService {
     let result;
     const docRef = this.db.doc(`${collection}/${id}`).get();
 
-    await docRef.toPromise().then((documentSnap) => {
+    await firstValueFrom(docRef).then((documentSnap) => {
       result = documentSnap.data();
       console.log(documentSnap.data());
     });

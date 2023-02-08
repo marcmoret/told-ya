@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { ActivatedRoute } from '@angular/router';
-import Chart from 'chart.js';
+import Chart from 'chart.js/auto';
 import { Argument } from 'model/arguement.model';
 import { ArgumentService } from 'src/api/argument.service';
 
@@ -49,7 +49,7 @@ export class VotingComponent implements OnInit {
   }
 
   initChart() {
-    const ctx = document.getElementById('myChart');
+    const ctx = document.getElementById('myChart') as HTMLCanvasElement;
     const chart = new Chart(ctx, {
       type: 'pie',
       data: {

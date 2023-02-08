@@ -11,18 +11,22 @@
   },
   "main": "lib/index.js",
   "dependencies": {
-    "@firebase/app": "^0.6.13",
-    "@types/node": "^14.11.2",
+    "@firebase/app": "^0.6.30",
+    "@firebase/functions-types": "^0.6.0",
+    "@types/node": "^18.13.0",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "firebase": "^8.0.2",
-    "firebase-admin": "^6.0.0",
-    "firebase-functions": "^2.1.0",
-    "twilio": "^3.51.0"
+    "express": "^4.18.2",
+    "firebase": "^9.17.1",
+    "firebase-admin": "^11.5.0",
+    "firebase-functions": "^4.2.1",
+    "twilio": "^4.7.1"
   },
   "devDependencies": {
     "tslint": "~5.8.0",
-    "typescript": "^3.5.1"
+    "typescript": "^4.9.5"
+  },
+  "engines": {
+    "node": "12"
   },
   "private": true
 }
