@@ -1,7 +1,7 @@
 {
   "hosting": [{
     "target": "told-ya",
-    "public": "docs/",
+    "public": "dist/angular-ci-firebase",
     "ignore": [
       "**/.*"
     ],
