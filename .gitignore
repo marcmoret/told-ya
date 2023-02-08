@@ -3,3 +3,4 @@ docs
 .angular
 dist
 .firebase
+firebase-debug.log
