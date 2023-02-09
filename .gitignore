@@ -4,3 +4,12 @@ docs
 dist
 .firebase
 firebase-debug.log
+functions/.env
+functions/ui-debug.log
+.gitignore
+functions/database-debug.log
+.gitignore
+.vscode/settings.json
+functions/firestore-debug.log
+.vscode
+

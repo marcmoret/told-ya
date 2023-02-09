@@ -16,6 +16,7 @@ export class VotingComponent implements OnInit {
   docId = '';
   voterId = '';
   isEligable = true;
+  chart: Chart;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -50,7 +51,10 @@ export class VotingComponent implements OnInit {
 
   initChart() {
     const ctx = document.getElementById('myChart') as HTMLCanvasElement;
-    const chart = new Chart(ctx, {
+    if(this.chart){
+      this.chart.destroy();
+    }
+    this.chart = new Chart(ctx, {
       type: 'pie',
       data: {
         labels: [this.argument.personA, this.argument.personB],
