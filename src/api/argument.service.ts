@@ -34,7 +34,7 @@ export class ArgumentService {
         const message = {
           message: argument.message.replace(
             '{{link}}',
-            `https://told-ya.web.app/argument/${response.id}`
+            `https://toldya.ca/argument/${response.id}`
           ),
           numbers: argument.numbers,
         };
