@@ -1,5 +1,5 @@
-import { FocusMonitor } from '@angular/cdk/a11y';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { FocusMonitor } from "@angular/cdk/a11y";
+import { coerceBooleanProperty } from "@angular/cdk/coercion";
 import {
   Component,
   ElementRef,
@@ -9,50 +9,37 @@ import {
   Optional,
   Self,
   ViewChild,
-} from '@angular/core';
-import {
-  AbstractControl,
-  ControlValueAccessor,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  NgControl,
-  Validators,
-} from '@angular/forms';
+} from "@angular/core";
+
 import {
   MAT_FORM_FIELD,
   MatFormField,
   MatFormFieldControl,
-} from '@angular/material/form-field';
-import { Subject } from 'rxjs';
-import { MyTel } from '../argument/argument.component';
+} from "@angular/material/form-field";
+import { Subject } from "rxjs";
+import { MyTel } from "../argument/argument.component";
+import { CommonModule } from "@angular/common";
+import { ReactiveFormsModule, ControlValueAccessor, FormGroup, FormBuilder, NgControl, Validators, AbstractControl } from "@angular/forms";
 
-/** @title Form field with custom telephone number input control. */
 @Component({
-  selector: 'app-phone-input',
-  templateUrl: 'phone-input.component.html',
-})
-/** Data structure for holding telephone number. */
-
-/** Custom `MatFormFieldControl` for telephone number input. */
-@Component({
-  selector: 'app-phone-input',
-  templateUrl: 'phone-input.component.html',
-  styleUrls: ['phone-input.component.css'],
+  selector: "app-phone-input",
+  templateUrl: "phone-input.component.html",
+  styleUrls: ["phone-input.component.css"],
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class PhoneInputComponent
-  implements ControlValueAccessor, MatFormFieldControl<MyTel>, OnDestroy {
+  implements ControlValueAccessor, MatFormFieldControl<MyTel>, OnDestroy
+{
   static nextId = 0;
   static ngAcceptInputType_disabled: boolean | string | null | undefined;
   static ngAcceptInputType_required: boolean | string | null | undefined;
 
   // tslint:disable-next-line:no-input-rename
-  @Input('aria-describedby') userAriaDescribedBy: string;
+  @Input("aria-describedby") userAriaDescribedBy: string;
 
-
-  @ViewChild('area') areaInput: HTMLInputElement;
-  @ViewChild('exchange') exchangeInput: HTMLInputElement;
-  @ViewChild('subscriber') subscriberInput: HTMLInputElement;
+  @ViewChild("area") areaInput: HTMLInputElement;
+  @ViewChild("exchange") exchangeInput: HTMLInputElement;
+  @ViewChild("subscriber") subscriberInput: HTMLInputElement;
   private _placeholder: string;
   private _required = false;
   private _disabled = false;
@@ -60,7 +47,7 @@ export class PhoneInputComponent
   parts: FormGroup;
   stateChanges = new Subject<void>();
   focused = false;
-  controlType = 'example-tel-input';
+  controlType = "example-tel-input";
   id = `example-tel-input-${0}`;
   onChange = (_: any) => {};
   onTouched = () => {};
@@ -116,7 +103,7 @@ export class PhoneInputComponent
     return null;
   }
   set value(tel: MyTel | null) {
-    const { area, exchange, subscriber } = tel || new MyTel('', '', '');
+    const { area, exchange, subscriber } = tel || new MyTel("", "", "");
     this.parts.setValue({ area, exchange, subscriber });
     this.stateChanges.next();
   }
@@ -165,13 +152,13 @@ export class PhoneInputComponent
     nextElement?: HTMLInputElement
   ): void {
     if (!control.errors && nextElement) {
-      this._focusMonitor.focusVia(nextElement, 'program');
+      this._focusMonitor.focusVia(nextElement, "program");
     }
   }
 
   autoFocusPrev(control: AbstractControl, prevElement: HTMLInputElement): void {
     if (control.value.length < 1) {
-      this._focusMonitor.focusVia(prevElement, 'program');
+      this._focusMonitor.focusVia(prevElement, "program");
     }
   }
 
@@ -183,20 +170,20 @@ export class PhoneInputComponent
   setDescribedByIds(ids: string[]) {
     // tslint:disable-next-line:no-non-null-assertion
     const controlElement = this._elementRef.nativeElement.querySelector(
-      '.example-tel-input-container'
+      ".example-tel-input-container"
     )!;
-    controlElement.setAttribute('aria-describedby', ids.join(' '));
+    controlElement.setAttribute("aria-describedby", ids.join(" "));
   }
 
   onContainerClick() {
     if (this.parts.controls.subscriber.valid) {
-      this._focusMonitor.focusVia(this.subscriberInput, 'program');
+      this._focusMonitor.focusVia(this.subscriberInput, "program");
     } else if (this.parts.controls.exchange.valid) {
-      this._focusMonitor.focusVia(this.subscriberInput, 'program');
+      this._focusMonitor.focusVia(this.subscriberInput, "program");
     } else if (this.parts.controls.area.valid) {
-      this._focusMonitor.focusVia(this.exchangeInput, 'program');
+      this._focusMonitor.focusVia(this.exchangeInput, "program");
     } else {
-      this._focusMonitor.focusVia(this.areaInput, 'program');
+      this._focusMonitor.focusVia(this.areaInput, "program");
     }
   }
 

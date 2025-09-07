@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormGroup,
-  FormBuilder,
-  Validators,
-  FormControl,
-} from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { Argument } from 'model/arguement.model';
 import { ArgumentService } from 'src/api/argument.service';
+import { AppModule } from "../app.module";
+import { QuillEditorComponent } from "ngx-quill";
+import { CommonModule } from '@angular/common';
 
 export class MyTel {
   constructor(
@@ -21,6 +20,7 @@ export class MyTel {
   selector: 'app-arguement',
   templateUrl: './argument.component.html',
   styleUrls: ['./argument.component.scss'],
+  imports: [MatCardModule, AppModule, QuillEditorComponent,CommonModule, ReactiveFormsModule],
 })
 export class ArgumentComponent implements OnInit {
   link: string;
