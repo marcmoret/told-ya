@@ -1,4 +1,4 @@
-import { MyMaterialModule } from './MdModule.module';
+
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -18,24 +18,17 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 @NgModule({
-  imports: [
-    MyMaterialModule,
-    QuillModule.forRoot(),
-    HeadComponent,
+  declarations: [
     AppComponent,
-    MainComponent,
-    ArgumentComponent,
-    CastVoteComponent,
-    VotingComponent,
-    PhoneInputComponent,
-    FooterComponent,
-    ReactiveFormsModule,
+  ],
+  imports: [
     BrowserModule,
     AppRoutingModule,
     NgbModule,
     AngularFireModule.initializeApp(environment.firebase),
   ],
   providers: [],
-  exports: [MyMaterialModule]
+  bootstrap: [AppComponent,],
+  exports: []
 })
 export class AppModule {}

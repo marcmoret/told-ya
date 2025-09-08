@@ -8,8 +8,8 @@ describe('CastVoteComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CastVoteComponent ]
-    })
+    imports: [CastVoteComponent]
+})
     .compileComponents();
   });
 

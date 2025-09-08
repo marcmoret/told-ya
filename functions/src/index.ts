@@ -2,8 +2,8 @@ const functions = require('firebase-functions');
 const cors = require('cors')({ origin: true });
 
 const twilio = require('twilio');
-const accountSid = functions.config().twilio.sid
-const authToken = functions.config().twilio.token
+const accountSid = functions.config().twilio.sid;
+const authToken = functions.config().twilio.token;
 const client = new twilio(accountSid, authToken);
 
 // Start writing Firebase Functions

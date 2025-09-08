@@ -4,9 +4,10 @@ import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { Argument } from 'model/arguement.model';
 import { ArgumentService } from 'src/api/argument.service';
-import { AppModule } from "../app.module";
 import { QuillEditorComponent } from "ngx-quill";
 import { CommonModule } from '@angular/common';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatInputModule } from "@angular/material/input";
 
 export class MyTel {
   constructor(
@@ -20,7 +21,7 @@ export class MyTel {
   selector: 'app-arguement',
   templateUrl: './argument.component.html',
   styleUrls: ['./argument.component.scss'],
-  imports: [MatCardModule, AppModule, QuillEditorComponent,CommonModule, ReactiveFormsModule],
+  imports: [QuillEditorComponent, CommonModule, ReactiveFormsModule, MatCardModule, MatStepperModule, MatInputModule]
 })
 export class ArgumentComponent implements OnInit {
   link: string;

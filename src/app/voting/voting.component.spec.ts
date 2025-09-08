@@ -8,8 +8,8 @@ describe('VotingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ VotingComponent ]
-    })
+    imports: [VotingComponent]
+})
     .compileComponents();
   });
 
