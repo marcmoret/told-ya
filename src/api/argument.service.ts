@@ -58,7 +58,7 @@ export class ArgumentService {
     });
   }
 
-  async verifyVoter(id: string, voterId: string) {
+  async verifyVoter(id: string) {
     let result;
     const docRef = this.db.doc(`${collection}/${id}`).get();
 
