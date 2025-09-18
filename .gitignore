@@ -12,4 +12,5 @@ functions/database-debug.log
 .vscode/settings.json
 functions/firestore-debug.log
 .vscode
-
+environments/environment.prod.ts
+environments/environment.ts
