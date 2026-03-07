@@ -9,22 +9,19 @@ describe('ArgumentService', () => {
   let service: ArgumentService;
 
   const functionsStub = {
-    httpsCallable: jasmine
-      .createSpy('httpsCallable')
-      .and.returnValue(() => of({ sent: 1, failed: 0 })),
+    httpsCallable: jasmine.createSpy('httpsCallable').and.callFake((name: string) => {
+      if (name === 'createArgument') {
+        return () => of({ argumentId: 'abc123' });
+      }
+
+      return () => of(void 0);
+    }),
   };
 
   const firestoreStub = {
     doc: jasmine.createSpy('doc').and.returnValue({
       valueChanges: () => of(undefined),
-      ref: {},
     }),
-    collection: jasmine.createSpy('collection').and.returnValue({
-      add: jasmine.createSpy('add').and.resolveTo({ id: 'abc123' }),
-    }),
-    firestore: {
-      runTransaction: jasmine.createSpy('runTransaction').and.resolveTo(undefined),
-    },
   };
 
   beforeEach(() => {
