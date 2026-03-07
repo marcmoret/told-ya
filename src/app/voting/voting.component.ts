@@ -1,78 +1,107 @@
-import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { MatCardModule } from '@angular/material/card';
-import { ActivatedRoute } from '@angular/router';
-import Chart from 'chart.js/auto';
-import { Argument } from 'model/arguement.model';
-import { ArgumentService } from 'src/api/argument.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+} from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+
+import { ArgumentService } from '../../api/argument.service';
+import {
+  Argument,
+  VoteSide,
+  getTotalVotes,
+  getVoteCountKey,
+  getVoterKey,
+  isValidVoterId,
+} from '../shared/models/argument';
+import { CastVoteComponent } from './cast-vote/cast-vote.component';
 
 @Component({
   selector: 'app-voting',
+  standalone: true,
+  imports: [RouterLink, CastVoteComponent],
   templateUrl: './voting.component.html',
-  styleUrls: ['./voting.component.css'],
-  imports: [MatCardModule],
+  styleUrl: './voting.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VotingComponent implements OnInit {
-  argument: Argument;
-  showChart = false;
-  docId = '';
-  voterId = '';
-  isEligable = true;
-  chart: Chart;
+  private readonly route = inject(ActivatedRoute);
+  private readonly argumentService = inject(ArgumentService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly db: AngularFirestore,
-    private readonly argumentService: ArgumentService
-  ) { }
+  protected argument: Argument | null = null;
+  protected argumentId = '';
+  protected voterId = '';
+  protected loading = true;
+  protected linkInvalid = false;
+  protected isEligible = false;
+  protected flashMessage = '';
 
   ngOnInit(): void {
-    const param = this.route.snapshot.paramMap.get('id');
-    this.docId = param.slice(0, -1);
-    this.voterId = param.slice(param.length - 1);
-    this.getArgument(param);
-    this.db.collection('arguments').doc(this.docId).valueChanges().subscribe((changes: Argument) => {
-      this.argument = changes;
-      this.initChart();
-    });
-  }
+    this.argumentId = this.route.snapshot.paramMap.get('argumentId') ?? '';
+    this.voterId = this.route.snapshot.paramMap.get('voterId') ?? '';
 
-  getArgument(id: string) {
-    this.argumentService.getArgument(this.docId).then((argument) => {
-      this.argument = argument.data();
-      this.verifyVoter();
-    });
-  }
-
-  verifyVoter() {
-    if (this.argument[`voter${this.voterId}`]) {
-      this.isEligable = false;
-      this.initChart();
+    if (!this.argumentId || !this.voterId) {
+      this.loading = false;
+      this.linkInvalid = true;
+      return;
     }
+
+    this.argumentService
+      .watchArgument(this.argumentId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((argument) => {
+        this.loading = false;
+
+        if (!argument) {
+          this.argument = null;
+          this.linkInvalid = true;
+          this.isEligible = false;
+          return;
+        }
+
+        this.argument = argument;
+        this.linkInvalid = !isValidVoterId(argument, this.voterId);
+        this.isEligible = !this.linkInvalid && !argument[getVoterKey(this.voterId)];
+      });
   }
 
-  initChart() {
-    const ctx = document.getElementById('myChart') as HTMLCanvasElement;
-    if(this.chart){
-      this.chart.destroy();
+  protected handleVoteRecorded(): void {
+    this.flashMessage = 'Vote recorded. Results are live now.';
+  }
+
+  protected get totalVotes(): number {
+    return this.argument ? getTotalVotes(this.argument) : 0;
+  }
+
+  protected votesFor(side: VoteSide): number {
+    return this.argument ? this.argument[getVoteCountKey(side)] : 0;
+  }
+
+  protected percentageFor(side: VoteSide): number {
+    if (!this.argument) {
+      return 0;
     }
-    this.chart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: [this.argument.personA, this.argument.personB],
-        datasets: [
-          {
-            label: '# of Votes',
-            data: [this.argument.votesA, this.argument.votesB],
-            backgroundColor: [
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 99, 132, 0.2)',
-            ],
-            borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
-            borderWidth: 1,
-          },
-        ],
-      },
-    });
+
+    const totalVotes = getTotalVotes(this.argument);
+
+    if (totalVotes === 0) {
+      return 0;
+    }
+
+    return Math.round((this.argument[getVoteCountKey(side)] / totalVotes) * 100);
+  }
+
+  protected get leadingLabel(): string {
+    if (!this.argument || this.argument.votesA === this.argument.votesB) {
+      return 'Tied';
+    }
+
+    return this.argument.votesA > this.argument.votesB
+      ? this.argument.personA
+      : this.argument.personB;
   }
 }

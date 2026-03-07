@@ -1,156 +1,185 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
+import {
+  AbstractControl,
+  FormArray,
+  FormControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Argument } from 'model/arguement.model';
-import { ArgumentService } from 'src/api/argument.service';
-import { QuillEditorComponent } from "ngx-quill";
-import { CommonModule } from '@angular/common';
-import { MatStepperModule } from '@angular/material/stepper';
-import { MatInputModule } from "@angular/material/input";
 
-export class MyTel {
-  constructor(
-    public area: string,
-    public exchange: string,
-    public subscriber: string
-  ) { }
+import { ArgumentService } from '../../api/argument.service';
+import { ArgumentDraft, getVoterKey } from '../shared/models/argument';
+
+const MAX_CONTACTS = 8;
+
+const phoneNumberValidator: ValidatorFn = (
+  control: AbstractControl
+): ValidationErrors | null => {
+  const digits = extractDigits(`${control.value ?? ''}`);
+  const isValidNorthAmericanNumber =
+    digits.length === 10 || (digits.length === 11 && digits.startsWith('1'));
+
+  return isValidNorthAmericanNumber ? null : { phoneNumber: true };
+};
+
+const duplicatePhoneNumbersValidator: ValidatorFn = (
+  control: AbstractControl
+): ValidationErrors | null => {
+  const values = Array.isArray(control.value) ? control.value : [];
+  const normalized = values
+    .map((value) => normalizePhoneNumber(`${value ?? ''}`))
+    .filter((value) => value.startsWith('+'));
+
+  return normalized.length === new Set(normalized).size
+    ? null
+    : { duplicatePhoneNumbers: true };
+};
+
+function extractDigits(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
+function normalizePhoneNumber(value: string): string {
+  const digits = extractDigits(value);
+
+  if (digits.length === 10) {
+    return `+1${digits}`;
+  }
+
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return `+${digits}`;
+  }
+
+  return value.trim();
+}
+
+function sanitizeSingleLine(value: string): string {
+  return value.replace(/\s+/g, ' ').trim();
+}
+
+function sanitizeParagraphs(value: string): string {
+  return value.replace(/\r\n/g, '\n').trim().replace(/\n{3,}/g, '\n\n');
+}
+
+function buildShareMessageTemplate(
+  personA: string,
+  personB: string,
+  topic: string
+): string {
+  return `Hey! ${personA} and ${personB} need help settling a disagreement about "${topic}". Vote here: {{link}}`;
 }
 
 @Component({
-  selector: 'app-arguement',
+  selector: 'app-argument',
+  standalone: true,
+  imports: [ReactiveFormsModule],
   templateUrl: './argument.component.html',
-  styleUrls: ['./argument.component.scss'],
-  imports: [QuillEditorComponent, CommonModule, ReactiveFormsModule, MatCardModule, MatStepperModule, MatInputModule]
+  styleUrl: './argument.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArgumentComponent implements OnInit {
-  link: string;
-  personForm: FormGroup;
-  topicForm: FormGroup;
-  argumentForm: FormGroup;
-  contactsForm: FormGroup;
-  topic: string;
-  personA: string;
-  personB: string;
-  arguementA: string;
-  arguementB: string;
+export class ArgumentComponent {
+  private readonly formBuilder = inject(FormBuilder).nonNullable;
+  private readonly argumentService = inject(ArgumentService);
+  private readonly router = inject(Router);
 
-  Object = Object;
+  protected readonly submitting = signal(false);
+  protected submitError = '';
 
-  constructor(
-    private readonly formBuilder: FormBuilder,
-    private readonly arguementService: ArgumentService,
-    private route: Router
-  ) {
-    this.personForm = this.formBuilder.group({
-      personA: ['', [Validators.required]],
-      personB: ['', [Validators.required]],
-    });
+  protected readonly form = this.formBuilder.group({
+    topic: ['', [Validators.required, Validators.maxLength(120)]],
+    personA: ['', [Validators.required, Validators.maxLength(40)]],
+    personB: ['', [Validators.required, Validators.maxLength(40)]],
+    argumentA: ['', [Validators.required, Validators.maxLength(600)]],
+    argumentB: ['', [Validators.required, Validators.maxLength(600)]],
+    contacts: this.formBuilder.array([this.createContactControl()], {
+      validators: duplicatePhoneNumbersValidator,
+    }),
+  });
 
-    this.topicForm = this.formBuilder.group({
-      topic: ['', [Validators.required]],
-    });
-
-    this.argumentForm = this.formBuilder.group({
-      argumentA: [''],
-      argumentB: [''],
-    });
-
-    this.contactsForm = this.formBuilder.group({
-      contact0: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(10),
-          Validators.minLength(10),
-          Validators.pattern(/^-?(0|[1-9]\d*)?$/),
-        ],
-      ],
-    });
+  protected get contacts(): FormArray<FormControl<string>> {
+    return this.form.controls.contacts;
   }
 
-  ngOnInit(): void { }
+  protected get previewMessage(): string {
+    const rawValue = this.form.getRawValue();
+    const personA = sanitizeSingleLine(rawValue.personA) || 'Alex';
+    const personB = sanitizeSingleLine(rawValue.personB) || 'Jordan';
+    const topic = sanitizeSingleLine(rawValue.topic) || 'who made the better call';
 
-  addPhone(index: number) {
-    this.contactsForm.addControl(`contact${index}`, new FormControl(''));
-    this.contactsForm.controls[`contact${index}`].setValidators([
-      Validators.maxLength(10),
-      Validators.minLength(10),
-      Validators.required,
-      Validators.pattern(/^-?(0|[1-9]\d*)?$/),
-    ]);
-    this.contactsForm.controls[`contact${index}`].updateValueAndValidity();
+    return buildShareMessageTemplate(personA, personB, topic).replace(
+      '{{link}}',
+      'https://toldya.ca/argument/example/1'
+    );
   }
 
-  deletePhone(index: number) {
-    this.contactsForm.removeControl(`contact${index}`);
+  protected addContact(): void {
+    if (this.contacts.length >= MAX_CONTACTS) {
+      return;
+    }
+
+    this.contacts.push(this.createContactControl());
   }
 
-  onTopicChange(quill: any) {
-    this.topic = quill.text;
+  protected removeContact(index: number): void {
+    if (this.contacts.length === 1) {
+      return;
+    }
+
+    this.contacts.removeAt(index);
+    this.contacts.markAsTouched();
+    this.contacts.updateValueAndValidity();
   }
 
-  onArgueA(quill: any) {
-    this.arguementA = quill.text;
-  }
+  protected async submit(): Promise<void> {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
-  onArgueB(quill: any) {
-    this.arguementB = quill.text;
-  }
+    this.submitError = '';
+    this.submitting.set(true);
 
-  submit() {
-    if (
-      this.contactsForm.valid &&
-      this.personForm.valid &&
-      this.argumentForm.valid &&
-      this.topicForm.valid
-    ) {
-      const numbers: string[] = Object.values(this.contactsForm.value);
-      const personA = this.personForm.get('personA').value;
-      const personB = this.personForm.get('personB').value;
+    try {
+      const rawValue = this.form.getRawValue();
+      const personA = sanitizeSingleLine(rawValue.personA);
+      const personB = sanitizeSingleLine(rawValue.personB);
+      const topic = sanitizeSingleLine(rawValue.topic);
+      const argumentA = sanitizeParagraphs(rawValue.argumentA);
+      const argumentB = sanitizeParagraphs(rawValue.argumentB);
+      const numbers = rawValue.contacts.map(normalizePhoneNumber);
 
-      // Quilljs sends the HTML tags so I had to remove the <p> tags.
-      const topic = this.topicForm
-        .get('topic')
-        .value.replace('<p>', '')
-        .replace('</p>', '');
-
-      const argumentA = this.argumentForm
-        .get('argumentA')
-        .value.replace('<p>', '')
-        .replace('</p>', '');
-
-      const argumentB = this.argumentForm
-        .get('argumentB')
-        .value.replace('<p>', '')
-        .replace('</p>', '');
-
-      const message = `
-      Hey!
-${personA} and ${personB} need you to settle an argument. Click the link below and vote who you think is right!
-{{link}}`;
-
-      const argument: Argument = {
-        topic: topic,
-        personA: personA,
-        argumentA: argumentA,
+      const argument: ArgumentDraft = {
+        topic,
+        personA,
+        personB,
+        argumentA,
+        argumentB,
         votesA: 0,
-        personB: personB,
-        argumentB: argumentB,
         votesB: 0,
-        numbers: numbers,
-        message: message,
-        voter0: true,
+        numbers,
+        shareMessageTemplate: buildShareMessageTemplate(personA, personB, topic),
         createdDate: new Date(),
       };
 
-      numbers.forEach((number, i) => {
-        argument[`voter${i + 1}`] = false;
+      argument[getVoterKey('0')] = true;
+      numbers.forEach((_, index) => {
+        argument[getVoterKey(String(index + 1))] = false;
       });
 
-      this.arguementService.submitArgument(argument).then((id) => {
-        this.route.navigateByUrl(`/argument/${id}0`);
-      });
+      const argumentId = await this.argumentService.submitArgument(argument);
+      await this.router.navigate(['/argument', argumentId, '0']);
+    } catch {
+      this.submitError = 'Could not create the vote right now. Try again in a moment.';
+    } finally {
+      this.submitting.set(false);
     }
+  }
+
+  private createContactControl(): FormControl<string> {
+    return this.formBuilder.control('', [Validators.required, phoneNumberValidator]);
   }
 }

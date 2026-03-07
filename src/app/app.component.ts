@@ -1,11 +1,15 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+import { FooterComponent } from './footer/footer.component';
+import { HeadComponent } from './head/head.component';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet, HeadComponent, FooterComponent],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  standalone: false,
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
-  title = 'told-ya';
-}
+export class AppComponent {}

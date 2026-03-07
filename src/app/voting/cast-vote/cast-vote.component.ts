@@ -1,47 +1,42 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Argument } from 'model/arguement.model';
-import { ArgumentService } from 'src/api/argument.service';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject } from '@angular/core';
+
+import { ArgumentService } from '../../../api/argument.service';
+import { Argument, VoteSide } from '../../shared/models/argument';
 
 @Component({
   selector: 'app-cast-vote',
+  standalone: true,
   templateUrl: './cast-vote.component.html',
-  styleUrls: ['./cast-vote.component.sass'],
+  styleUrl: './cast-vote.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CastVoteComponent implements OnInit {
-  @Input() argument: Argument;
-  @Input() docId: string;
-  @Input() voterId: string;
-  @Output()
-  castVoted = new EventEmitter();
+export class CastVoteComponent {
+  private readonly argumentService = inject(ArgumentService);
 
-  loadingA = false;
-  loadingB = false;
+  @Input({ required: true }) argument!: Argument;
+  @Input({ required: true }) argumentId!: string;
+  @Input({ required: true }) voterId!: string;
+  @Input() canVote = false;
+  @Output() voted = new EventEmitter<void>();
 
-  constructor(
-    private readonly argumentService: ArgumentService,
-    private readonly snackService: MatSnackBar
-  ) {}
+  protected pendingSide: VoteSide | null = null;
+  protected errorMessage = '';
 
-  ngOnInit(): void {}
+  protected async castVote(side: VoteSide): Promise<void> {
+    if (!this.canVote || this.pendingSide) {
+      return;
+    }
 
-  async castVote(person: string) {
-    console.log(this.argument);
+    this.errorMessage = '';
+    this.pendingSide = side;
 
-    this.argument[`votes${person}`]++;
-
-    const voteTotal = this.argument[`votes${person}`];
-    console.log(voteTotal);
-    const result = this.argumentService
-      .castVote(this.voterId, voteTotal, this.docId, person)
-      .then((res) => {
-        this.snackService.open('Successfully casted vote!', '', {
-          duration: 3000,
-        });
-        this.castVoted.emit(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      await this.argumentService.castVote(this.argumentId, this.voterId, side);
+      this.voted.emit();
+    } catch {
+      this.errorMessage = 'Could not record your vote. Refresh the page and try again.';
+    } finally {
+      this.pendingSide = null;
+    }
   }
 }

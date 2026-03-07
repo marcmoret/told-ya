@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-head',
+  standalone: true,
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './head.component.html',
-  styleUrls: ['./head.component.scss']
+  styleUrl: './head.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeadComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
-}
+export class HeadComponent {}

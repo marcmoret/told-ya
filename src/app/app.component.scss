@@ -1,8 +1,25 @@
-.masthead {
-  height: 100vh;
-  min-height: 500px;
-  background-image: url('https://source.unsplash.com/BtbjCFUvBXs/1920x1080');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  color: var(--color-ink);
+}
+
+.app-content {
+  padding: 2rem 1.5rem 4rem;
+}
+
+.content-frame {
+  width: min(72rem, 100%);
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .app-content {
+    padding-inline: 1rem;
+    padding-bottom: 3rem;
+  }
 }

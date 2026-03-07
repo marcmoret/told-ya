@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  appUrl: 'https://toldya.ca',
   firebase: {
     apiKey: 'AIzaSyCIC3vzl_eb5NiCvF22WjKYWhmFRaOLT7c',
     authDomain: 'told-ya.firebaseapp.com',

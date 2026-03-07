@@ -1,11 +1,63 @@
-<!-- Full Page Image Header with Vertically Centered Content -->
-<h1 class="font-weight-light">Solve all your arguements right here!</h1>
+<section class="hero">
+  <div class="hero__copy">
+    <p class="eyebrow">Settle it properly</p>
+    <h1>Let both sides make the case. Then send one clean vote.</h1>
+    <p class="hero__lede">
+      Told Ya keeps the decision simple: frame the argument, text the voters, and let the result speak
+      for itself.
+    </p>
 
-<button
-  type="button"
-  class="btn btn-secondary btn-lg"
-  [routerLink]="['/argument']"
-  routerLinkActive="router-link-active"
->
-  Let's get started
-</button>
+    <div class="hero__actions">
+      <a class="button button--primary" routerLink="/argument">Start a vote</a>
+      <a class="button button--secondary" href="#how-it-works">How it works</a>
+    </div>
+  </div>
+
+  <aside class="hero__panel">
+    <p class="eyebrow">Example</p>
+    <h2>Who makes the better Sunday breakfast?</h2>
+    <div class="hero__matchup">
+      <div>
+        <p class="hero__name">Jamie</p>
+        <p class="hero__position">Savory, fast, no drama.</p>
+      </div>
+      <div>
+        <p class="hero__name">Taylor</p>
+        <p class="hero__position">Pancakes, fruit, and the full spread.</p>
+      </div>
+    </div>
+    <p class="hero__note">6 voters invited. 6 unique links. Nobody arguing in the thread.</p>
+  </aside>
+</section>
+
+<section class="process" id="how-it-works">
+  <div class="section-heading">
+    <p class="eyebrow">How it works</p>
+    <h2>Small product, tight loop.</h2>
+  </div>
+
+  <div class="process__grid">
+    @for (step of steps; track step.title) {
+      <article class="process-card">
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.body }}</p>
+      </article>
+    }
+  </div>
+</section>
+
+<section class="highlights">
+  <div class="section-heading">
+    <p class="eyebrow">Why it holds up</p>
+    <h2>Enough structure to be fair. Not enough friction to kill the moment.</h2>
+  </div>
+
+  <div class="highlights__grid">
+    @for (highlight of highlights; track highlight.title) {
+      <article class="highlight-card">
+        <h3>{{ highlight.title }}</h3>
+        <p>{{ highlight.body }}</p>
+      </article>
+    }
+  </div>
+</section>

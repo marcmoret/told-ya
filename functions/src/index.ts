@@ -1,48 +1,53 @@
-const functions = require('firebase-functions');
-const cors = require('cors')({ origin: true });
+import * as functions from 'firebase-functions/v1';
 
 const twilio = require('twilio');
 const accountSid = functions.config().twilio.sid;
 const authToken = functions.config().twilio.token;
-const client = new twilio(accountSid, authToken);
+const client = twilio(accountSid, authToken);
 
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
+interface SmsRecipient {
+  message: string;
+  number: string;
+}
 
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   // console.log(accountSid);
-//   // console.log(authToken);
+interface SendSmsPayload {
+  recipients?: SmsRecipient[];
+}
 
-//   response.send("Hello from Firebase!");
-// });
+export const sendSms = functions.https.onCall(
+  async (data: SendSmsPayload) => {
+    const recipients = Array.isArray(data?.recipients) ? data.recipients : [];
 
-export const sendSms = functions.https.onRequest((req, res) => {
-
-  cors(req, res, async () => {
-    const data = req.body.data;
-    const message = data.message;
-    const numbers = data.numbers;
-
-    const results = [];
-    let msgCounter = 0;
-
-    for (const number of numbers) {
-      msgCounter++;
-      await client.messages
-        .create({
-          body: `${message}${msgCounter}`,
-          from: '+14256001653',
-          to: number,
-        })
-        .then((respo) => {
-          results.push(respo);
-        })
-        .catch((err) => {
-          console.log('Error: ' + err)
-          results.push(err);
-        });
+    if (recipients.length === 0) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'At least one recipient is required.'
+      );
     }
 
-    return res.status(200).send({ data: results }).end();
-  });
-});
+    const results = await Promise.all(
+      recipients.map(async ({ message, number }) => {
+        try {
+          await client.messages.create({
+            body: message,
+            from: '+14256001653',
+            to: number,
+          });
+          return true;
+        } catch (error) {
+          functions.logger.error('Failed to send SMS message.', {
+            error,
+            number,
+          });
+          return false;
+        }
+      })
+    );
+
+    const sent = results.filter(Boolean).length;
+    return {
+      sent,
+      failed: results.length - sent,
+    };
+  }
+);

@@ -1,71 +1,91 @@
-import { Injectable } from '@angular/core';
-import {
-  AngularFirestore,
-} from '@angular/fire/compat/firestore';
+import { Injectable, inject } from '@angular/core';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
-import { Argument } from 'model/arguement.model';
-import { firstValueFrom } from 'rxjs';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Observable, firstValueFrom } from 'rxjs';
 
-const collection = 'arguments';
+import { environment } from '../environments/environment';
+import {
+  Argument,
+  ArgumentDraft,
+  VoteSide,
+  getVoteCountKey,
+  getVoterKey,
+} from '../app/shared/models/argument';
+
+const COLLECTION = 'arguments';
+
+interface SmsRecipient {
+  number: string;
+  message: string;
+}
+
+interface SendSmsRequest {
+  recipients: SmsRecipient[];
+}
+
+interface SendSmsResponse {
+  sent: number;
+  failed: number;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class ArgumentService {
-  constructor(
-    private readonly functions: AngularFireFunctions,
-    private readonly db: AngularFirestore
-  ) { }
+  private readonly functions = inject(AngularFireFunctions);
+  private readonly db = inject(AngularFirestore);
 
-  sendSms(message) {
-    const sendSmsRequest = this.functions.httpsCallable('sendSms');
-    firstValueFrom(sendSmsRequest({
-      message: message.message,
-      numbers: message.numbers,
-    }));
+  watchArgument(id: string): Observable<Argument | undefined> {
+    return this.db.doc<Argument>(`${COLLECTION}/${id}`).valueChanges();
   }
 
-  async submitArgument(argument: Argument) {
-    let id = '';
-    await this.db
-      .collection(collection)
-      .add(argument)
-      .then((response) => {
-        const message = {
-          message: argument.message.replace(
-            '{{link}}',
-            `https://toldya.ca/argument/${response.id}`
-          ),
-          numbers: argument.numbers,
-        };
-        this.sendSms(message);
-        id = response.id;
+  async submitArgument(argument: ArgumentDraft): Promise<string> {
+    const documentReference = await this.db
+      .collection<ArgumentDraft>(COLLECTION)
+      .add(argument);
+
+    await this.sendSms(
+      argument.numbers.map((number, index) => ({
+        number,
+        message: argument.shareMessageTemplate.replace(
+          '{{link}}',
+          `${environment.appUrl}/argument/${documentReference.id}/${index + 1}`
+        ),
+      }))
+    );
+
+    return documentReference.id;
+  }
+
+  async castVote(argumentId: string, voterId: string, side: VoteSide): Promise<void> {
+    const documentReference = this.db.doc<Argument>(`${COLLECTION}/${argumentId}`).ref;
+
+    await this.db.firestore.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(documentReference);
+
+      if (!snapshot.exists) {
+        throw new Error('Argument not found.');
+      }
+
+      const argument = snapshot.data() as Argument;
+      const voterKey = getVoterKey(voterId);
+
+      if (argument[voterKey]) {
+        return;
+      }
+
+      const voteCountKey = getVoteCountKey(side);
+      const nextVoteTotal = argument[voteCountKey] + 1;
+
+      transaction.update(documentReference, {
+        [voterKey]: true,
+        [voteCountKey]: nextVoteTotal,
       });
-    return id;
-  }
-
-  getArgument(id: string): Promise<any> {
-    return firstValueFrom(this.db.doc(`arguments/${id}`).get());
-  }
-
-  async castVote(voterId: string, voteTotal: number, docId: string, person) {
-    const voter = `voter${voterId}`;
-    const votes = `votes${person}`;
-
-    return this.db.doc(`${collection}/${docId}`).update({
-      [voter]: true,
-      [votes]: voteTotal,
     });
   }
 
-  async verifyVoter(id: string) {
-    let result;
-    const docRef = this.db.doc(`${collection}/${id}`).get();
-
-    await firstValueFrom(docRef).then((documentSnap) => {
-      result = documentSnap.data();
-      console.log(documentSnap.data());
-    });
-    return result;
+  private async sendSms(recipients: SmsRecipient[]): Promise<SendSmsResponse> {
+    const sendSmsRequest = this.functions.httpsCallable<SendSmsRequest, SendSmsResponse>('sendSms');
+    return firstValueFrom(sendSmsRequest({ recipients }));
   }
 }

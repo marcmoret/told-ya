@@ -5,5 +5,7 @@
     "types": [],
     "allowSyntheticDefaultImports": true
   },
+  "files": ["main.ts"],
+  "include": ["**/*.d.ts"],
   "exclude": ["test.ts", "**/*.spec.ts"]
 }

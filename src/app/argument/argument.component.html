@@ -1,150 +1,167 @@
-<mat-card style="border: 1px solid grey; height: 100%">
-  <mat-card-content>
-    <div style="height: 100%">
-      <mat-horizontal-stepper [linear]="false" #stepper>
-        <mat-step [stepControl]="topicForm" label="The topic of debate">
-          <form [formGroup]="topicForm">
-            <ng-template matStepLabel>The Topic of Debate</ng-template>
-            <div class="row form-group">
-              <quill-editor
-                formControlName="topic"
-                (onEditorChanged)="onTopicChange($event)"
-              ></quill-editor>
-            </div>
-          </form>
-          <div class="margin-top">
-            <button mat-button matStepperNext>Next</button>
-          </div>
-        </mat-step>
-        <mat-step [stepControl]="personForm">
-          <form [formGroup]="personForm" class="form-group">
-            <ng-template matStepLabel>Names</ng-template>
-            <div class="row"><mat-label>First challenger</mat-label></div>
-            <div class="row">
-              <mat-form-field appearance="outline">
-                <mat-label>Name</mat-label>
-                <input matInput formControlName="personA" required />
-                <mat-error>This field is required</mat-error>
-              </mat-form-field>
-            </div>
-            <div class="row"><mat-label>Second challenger</mat-label></div>
+<section class="compose-page">
+  <section class="panel panel--form">
+    <header class="section-heading">
+      <p class="eyebrow">Create a vote</p>
+      <h1>Frame the question, not the drama.</h1>
+      <p>
+        Write the topic clearly, capture both sides in plain language, and send each voter a unique
+        link.
+      </p>
+    </header>
 
-            <div class="row">
-              <mat-form-field appearance="outline">
-                <mat-label>Name</mat-label>
-                <input matInput formControlName="personB" required />
-                <mat-error>This field is required</mat-error>
-              </mat-form-field>
-            </div>
-            <div>
-              <button mat-button matStepperPrevious>Back</button>
-              <button mat-button matStepperNext>Next</button>
-            </div>
-          </form> 
-        </mat-step>
-        <mat-step [stepControl]="argumentForm" label="First Analysis">
-          <form [formGroup]="argumentForm">
-            <div class="margin">
-              <mat-label>First Challenger's Opinion</mat-label>
-            </div>
-            <div>
-              <quill-editor
-                formControlName="argumentA"
-                (onEditorChanged)="onArgueA($event)"
-              ></quill-editor>
-            </div>
-            <div class="margin">
-              <button mat-button matStepperPrevious>Back</button>
-              <button mat-button matStepperNext>Next</button>
-            </div>
-          </form>
-        </mat-step>
+    <form class="compose-form" [formGroup]="form" (ngSubmit)="submit()">
+      <section class="compose-section">
+        <div class="compose-section__header">
+          <h2>The debate</h2>
+          <p>Keep it short and neutral so the vote stays fair.</p>
+        </div>
 
-        <mat-step [stepControl]="argumentForm" label="Second Analysis">
-          <form [formGroup]="argumentForm">
-            <div class="margin">
-              <mat-label>Second Challenger's Opinion</mat-label>
-            </div>
-            <div>
-              <quill-editor
-                formControlName="argumentB"
-                (onEditorChanged)="onArgueB($event)"
-              ></quill-editor>
-            </div>
-            <div class="margin">
-              <button mat-button matStepperPrevious>Back</button>
-              <button mat-button matStepperNext>Next</button>
-            </div>
-          </form>
-        </mat-step>
+        <label class="field">
+          <span class="field__label">Topic</span>
+          <input class="field__input" type="text" formControlName="topic" placeholder="Who makes the better pizza?" />
+          @if (form.controls.topic.touched && form.controls.topic.invalid) {
+            <span class="field__error">Enter the question everyone is deciding.</span>
+          }
+        </label>
+      </section>
 
-        <mat-step>
-          <ng-template matStepLabel>Done</ng-template>
-          <form [formGroup]="contactsForm">
-            <div class="row">
-              <div class="col-12">
-                <mat-label>Voters</mat-label>
-              </div>
-            </div>
-            <div
-              class="row"
-              *ngFor="
-                let control of Object.keys(contactsForm.controls);
-                let i = index;
-                let last = last;
-                let first = first
-              "
-            >
-              <div class="col">
-                <mat-form-field appearance="outline" class="margin-left-form">
-                  <mat-label>Phone Number</mat-label>
-                  <input
-                    matInput
-                    type="text"
-                    [formControlName]="'contact' + i"
-                  />
-                  <mat-error
-                    *ngIf="
-                      contactsForm.controls['contact' + i]?.errors?.required
-                    "
-                    >This field is required</mat-error
-                  >
-                  <mat-error
-                    *ngIf="contactsForm.controls['contact' + i]?.errors?.max"
-                    >Too many numbers entered</mat-error
-                  >
-                  <mat-error
-                    *ngIf="contactsForm.controls['contact' + i]?.errors?.min"
-                    >Missing numbers</mat-error
-                  >
-                  <mat-error
-                    *ngIf="
-                      contactsForm.controls['contact' + i]?.errors?.pattern
-                    "
-                    >Only numbers are allowed</mat-error
-                  >
-                </mat-form-field>
-                <button
-                  mat-button
-                  (click)="addPhone(i + 1)"
-                  class="margin-left"
-                >
-                  <mat-icon *ngIf="last">add</mat-icon>
-                </button>
-                <button mat-button (click)="deletePhone(i)" class="margin-left">
-                  <mat-icon *ngIf="!first && last" class="delete-icon"
-                    >delete</mat-icon
-                  >
-                </button>
-              </div>
-            </div>
-          </form>
+      <section class="compose-section compose-section--split">
+        <div class="compose-section__header">
+          <h2>The people</h2>
+          <p>Name each side once and keep the rest in the argument copy.</p>
+        </div>
+
+        <div class="split-grid">
+          <label class="field">
+            <span class="field__label">Person A</span>
+            <input class="field__input" type="text" formControlName="personA" placeholder="Jamie" />
+            @if (form.controls.personA.touched && form.controls.personA.invalid) {
+              <span class="field__error">Add the first person.</span>
+            }
+          </label>
+
+          <label class="field">
+            <span class="field__label">Person B</span>
+            <input class="field__input" type="text" formControlName="personB" placeholder="Taylor" />
+            @if (form.controls.personB.touched && form.controls.personB.invalid) {
+              <span class="field__error">Add the second person.</span>
+            }
+          </label>
+        </div>
+      </section>
+
+      <section class="compose-section compose-section--split">
+        <div class="compose-section__header">
+          <h2>The case for each side</h2>
+          <p>Give each person enough space to make the point without turning this into a manifesto.</p>
+        </div>
+
+        <div class="split-grid">
+          <label class="field field--tall">
+            <span class="field__label">Argument for {{ form.controls.personA.value || 'Person A' }}</span>
+            <textarea
+              class="field__input field__input--textarea"
+              rows="8"
+              formControlName="argumentA"
+              placeholder="State the strongest version of their case."
+            ></textarea>
+            @if (form.controls.argumentA.touched && form.controls.argumentA.invalid) {
+              <span class="field__error">Add the first side of the argument.</span>
+            }
+          </label>
+
+          <label class="field field--tall">
+            <span class="field__label">Argument for {{ form.controls.personB.value || 'Person B' }}</span>
+            <textarea
+              class="field__input field__input--textarea"
+              rows="8"
+              formControlName="argumentB"
+              placeholder="State the strongest version of their case."
+            ></textarea>
+            @if (form.controls.argumentB.touched && form.controls.argumentB.invalid) {
+              <span class="field__error">Add the second side of the argument.</span>
+            }
+          </label>
+        </div>
+      </section>
+
+      <section class="compose-section">
+        <div class="compose-section__header compose-section__header--inline">
           <div>
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-button (click)="submit()">Submit</button>
+            <h2>The voters</h2>
+            <p>Use North American mobile numbers. Every person gets one link and one vote.</p>
           </div>
-        </mat-step>
-      </mat-horizontal-stepper>
-    </div>
-  </mat-card-content>
-</mat-card>
+          <button class="text-button" type="button" (click)="addContact()" [disabled]="contacts.length >= 8">
+            Add another voter
+          </button>
+        </div>
+
+        <div class="voter-list" formArrayName="contacts">
+          @for (contactControl of contacts.controls; track $index) {
+            <div class="voter-row">
+              <label class="field">
+                <span class="field__label">Voter {{ $index + 1 }}</span>
+                <input
+                  class="field__input"
+                  type="tel"
+                  [formControlName]="$index"
+                  placeholder="416 555 0123"
+                />
+                @if (contactControl.touched && contactControl.hasError('required')) {
+                  <span class="field__error">Enter a phone number.</span>
+                }
+                @if (contactControl.touched && contactControl.hasError('phoneNumber')) {
+                  <span class="field__error">Use a 10-digit North American number.</span>
+                }
+              </label>
+
+              <button
+                class="text-button text-button--danger"
+                type="button"
+                (click)="removeContact($index)"
+                [disabled]="contacts.length === 1"
+              >
+                Remove
+              </button>
+            </div>
+          }
+        </div>
+
+        @if (contacts.touched && contacts.hasError('duplicatePhoneNumbers')) {
+          <p class="field__error field__error--standalone">Each voter needs a unique phone number.</p>
+        }
+      </section>
+
+      @if (submitError) {
+        <p class="submit-error">{{ submitError }}</p>
+      }
+
+      <div class="compose-actions">
+        <button class="action-button action-button--primary" type="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Sending invites...' : 'Create vote' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <aside class="panel panel--preview">
+    <p class="eyebrow">Preview</p>
+    <h2>What voters will receive</h2>
+    <p class="preview-message">{{ previewMessage }}</p>
+
+    <dl class="preview-stats">
+      <div>
+        <dt>Voters</dt>
+        <dd>{{ contacts.length }}</dd>
+      </div>
+      <div>
+        <dt>Unique links</dt>
+        <dd>{{ contacts.length }}</dd>
+      </div>
+      <div>
+        <dt>Organizer view</dt>
+        <dd>Live tally only</dd>
+      </div>
+    </dl>
+  </aside>
+</section>

@@ -1,12 +1,82 @@
-<mat-card style="border: 1px solid grey; height: 100%">
-    <mat-card-content>
-        <h1>Voting Booth</h1>
-        <div [class.display]="isEligable">
-            <canvas id="myChart"></canvas>
+@if (loading) {
+  <section class="vote-state">
+    <p class="eyebrow">Loading vote</p>
+    <h1>Pulling the latest tally.</h1>
+  </section>
+} @else if (linkInvalid || !argument) {
+  <section class="vote-state">
+    <p class="eyebrow">Link unavailable</p>
+    <h1>This vote link is missing or invalid.</h1>
+    <p>Start a new vote if you still need a tie-breaker.</p>
+    <a class="state-link" routerLink="/argument">Create a vote</a>
+  </section>
+} @else {
+  <section class="vote-page">
+    <header class="vote-header">
+      <p class="eyebrow">Community verdict</p>
+      <h1>{{ argument.topic }}</h1>
+      <p class="vote-header__meta">
+        @if (isEligible) {
+          This link carries one vote. Cast it to unlock the live tally.
+        } @else if (voterId === '0') {
+          This is the organizer view. Results update live below.
+        } @else {
+          This vote has already been used. The live tally is below.
+        }
+      </p>
+      @if (flashMessage) {
+        <p class="vote-header__notice">{{ flashMessage }}</p>
+      }
+    </header>
+
+    <div class="vote-layout">
+      <app-cast-vote
+        [argument]="argument"
+        [argumentId]="argumentId"
+        [voterId]="voterId"
+        [canVote]="isEligible"
+        (voted)="handleVoteRecorded()"
+      ></app-cast-vote>
+
+      <aside class="results-card">
+        <div class="results-card__header">
+          <div>
+            <p class="eyebrow">Live result</p>
+            <h2>{{ leadingLabel }}</h2>
+          </div>
+          <span class="results-card__count">{{ totalVotes }} vote{{ totalVotes === 1 ? '' : 's' }}</span>
         </div>
-        <div>
-            <app-cast-vote (castVoted)="getArgument()" *ngIf="isEligable" [argument]="argument" [docId]="docId"
-                [voterId]="voterId"></app-cast-vote>
-        </div>
-    </mat-card-content>
-</mat-card>
+
+        @if (isEligible) {
+          <div class="results-card__lock">
+            Cast your vote first. The count unlocks immediately after.
+          </div>
+        } @else {
+          <div class="results-card__rows">
+            <div class="result-row">
+              <div class="result-row__label">
+                <span>{{ argument.personA }}</span>
+                <strong>{{ votesFor('A') }} votes</strong>
+              </div>
+              <div class="result-row__track">
+                <div class="result-row__fill" [style.width.%]="percentageFor('A')"></div>
+              </div>
+              <span class="result-row__percent">{{ percentageFor('A') }}%</span>
+            </div>
+
+            <div class="result-row result-row--secondary">
+              <div class="result-row__label">
+                <span>{{ argument.personB }}</span>
+                <strong>{{ votesFor('B') }} votes</strong>
+              </div>
+              <div class="result-row__track">
+                <div class="result-row__fill" [style.width.%]="percentageFor('B')"></div>
+              </div>
+              <span class="result-row__percent">{{ percentageFor('B') }}%</span>
+            </div>
+          </div>
+        }
+      </aside>
+    </div>
+  </section>
+}
