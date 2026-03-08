@@ -1,127 +1,232 @@
-<mat-card class="argument-card glass-card">
-  <mat-card-content>
-    <mat-horizontal-stepper [linear]="false" #stepper>
-      <mat-step [stepControl]="topicForm" label="The topic of debate">
-        <form [formGroup]="topicForm">
-          <ng-template matStepLabel>The Topic of Debate</ng-template>
-          <div class="step-content">
+<div class="argument-card glass-card">
+
+  <!-- Progress Indicator -->
+  <div class="step-progress">
+    <div class="progress-track">
+      <div class="progress-fill" [style.width.%]="progressWidth"></div>
+    </div>
+    <div class="step-dots">
+      @for (step of steps; track $index) {
+        <button
+          class="step-dot"
+          [class.active]="currentStep === $index"
+          [class.completed]="isStepComplete($index) && currentStep !== $index"
+          [class.clickable]="$index <= currentStep"
+          (click)="goToStep($index)"
+        >
+          <span class="dot-inner">
+            @if (isStepComplete($index) && currentStep !== $index) {
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            } @else {
+              {{ $index + 1 }}
+            }
+          </span>
+          <span class="dot-label">{{ step.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Steps Container -->
+  <div class="steps-container" [@stepAnimation]="currentStep">
+
+    <!-- Step 0: Topic -->
+    @if (currentStep === 0) {
+      <div class="step-panel">
+        <div class="step-header">
+          <span class="step-icon">💬</span>
+          <h2 class="step-title">What's the debate?</h2>
+          <p class="step-desc">Describe the argument you need settled.</p>
+        </div>
+        <form [formGroup]="topicForm" class="step-body">
+          <div class="editor-wrap">
             <quill-editor
               formControlName="topic"
               (onEditorChanged)="onTopicChange($event)"
+              placeholder="e.g. Is a hot dog a sandwich?"
             ></quill-editor>
           </div>
         </form>
-        <div class="step-actions">
-          <button mat-button matStepperNext class="btn-gradient btn-sm">Next</button>
+        <div class="step-nav">
+          <div></div>
+          <button class="btn-next" (click)="nextStep()">
+            Continue
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
         </div>
-      </mat-step>
+      </div>
+    }
 
-      <mat-step [stepControl]="personForm">
-        <form [formGroup]="personForm" class="form-group">
-          <ng-template matStepLabel>Names</ng-template>
-          <div class="step-content">
-            <div class="challenger-label"><mat-label>First challenger</mat-label></div>
-            <mat-form-field appearance="outline">
-              <mat-label>Name</mat-label>
-              <input matInput formControlName="personA" required />
-              <mat-error>This field is required</mat-error>
-            </mat-form-field>
-            <div class="challenger-label"><mat-label>Second challenger</mat-label></div>
-            <mat-form-field appearance="outline">
-              <mat-label>Name</mat-label>
-              <input matInput formControlName="personB" required />
-              <mat-error>This field is required</mat-error>
-            </mat-form-field>
-          </div>
-          <div class="step-actions">
-            <button mat-button matStepperPrevious class="btn-back">Back</button>
-            <button mat-button matStepperNext class="btn-gradient btn-sm">Next</button>
-          </div>
-        </form>
-      </mat-step>
-
-      <mat-step [stepControl]="argumentForm" label="First Analysis">
-        <form [formGroup]="argumentForm">
-          <div class="step-content">
-            <mat-label>First Challenger's Opinion</mat-label>
-            <div class="quill-wrap">
-              <quill-editor
-                formControlName="argumentA"
-                (onEditorChanged)="onArgueA($event)"
-              ></quill-editor>
+    <!-- Step 1: Names -->
+    @if (currentStep === 1) {
+      <div class="step-panel">
+        <div class="step-header">
+          <span class="step-icon">👥</span>
+          <h2 class="step-title">Who's arguing?</h2>
+          <p class="step-desc">Enter the names of the two challengers.</p>
+        </div>
+        <form [formGroup]="personForm" class="step-body">
+          <div class="name-fields">
+            <div class="name-field">
+              <label class="field-label field-label-a">Challenger A</label>
+              <input
+                type="text"
+                formControlName="personA"
+                class="ty-input"
+                placeholder="First person's name"
+              />
+              @if (personForm.get('personA')?.touched && personForm.get('personA')?.errors?.['required']) {
+                <span class="field-error">Name is required</span>
+              }
             </div>
-          </div>
-          <div class="step-actions">
-            <button mat-button matStepperPrevious class="btn-back">Back</button>
-            <button mat-button matStepperNext class="btn-gradient btn-sm">Next</button>
-          </div>
-        </form>
-      </mat-step>
-
-      <mat-step [stepControl]="argumentForm" label="Second Analysis">
-        <form [formGroup]="argumentForm">
-          <div class="step-content">
-            <mat-label>Second Challenger's Opinion</mat-label>
-            <div class="quill-wrap">
-              <quill-editor
-                formControlName="argumentB"
-                (onEditorChanged)="onArgueB($event)"
-              ></quill-editor>
-            </div>
-          </div>
-          <div class="step-actions">
-            <button mat-button matStepperPrevious class="btn-back">Back</button>
-            <button mat-button matStepperNext class="btn-gradient btn-sm">Next</button>
-          </div>
-        </form>
-      </mat-step>
-
-      <mat-step>
-        <ng-template matStepLabel>Done</ng-template>
-        <form [formGroup]="contactsForm">
-          <div class="step-content">
-            <mat-label>Voters</mat-label>
-            <div formArrayName="contacts" class="contacts-list">
-              @for (control of contacts.controls; track $index; let last = $last; let first = $first) {
-                <div class="contact-row">
-                  <mat-form-field appearance="outline" class="contact-field">
-                    <mat-label>Phone Number</mat-label>
-                    <input matInput type="text" [formControlName]="$index" />
-                    @if (control.errors?.['required']) {
-                      <mat-error>This field is required</mat-error>
-                    }
-                    @if (control.errors?.['maxlength']) {
-                      <mat-error>Too many numbers entered</mat-error>
-                    }
-                    @if (control.errors?.['minlength']) {
-                      <mat-error>Missing numbers</mat-error>
-                    }
-                    @if (control.errors?.['pattern']) {
-                      <mat-error>Only numbers are allowed</mat-error>
-                    }
-                  </mat-form-field>
-                  <div class="contact-actions">
-                    @if (last) {
-                      <button mat-icon-button (click)="addPhone()" class="action-add">
-                        <mat-icon>add_circle</mat-icon>
-                      </button>
-                    }
-                    @if (!first && last) {
-                      <button mat-icon-button (click)="deletePhone($index)" class="action-delete">
-                        <mat-icon>remove_circle</mat-icon>
-                      </button>
-                    }
-                  </div>
-                </div>
+            <div class="name-vs">VS</div>
+            <div class="name-field">
+              <label class="field-label field-label-b">Challenger B</label>
+              <input
+                type="text"
+                formControlName="personB"
+                class="ty-input"
+                placeholder="Second person's name"
+              />
+              @if (personForm.get('personB')?.touched && personForm.get('personB')?.errors?.['required']) {
+                <span class="field-error">Name is required</span>
               }
             </div>
           </div>
         </form>
-        <div class="step-actions">
-          <button mat-button matStepperPrevious class="btn-back">Back</button>
-          <button class="btn-gradient" (click)="submit()">Submit</button>
+        <div class="step-nav">
+          <button class="btn-back" (click)="prevStep()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back
+          </button>
+          <button class="btn-next" (click)="nextStep()">
+            Continue
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
         </div>
-      </mat-step>
-    </mat-horizontal-stepper>
-  </mat-card-content>
-</mat-card>
+      </div>
+    }
+
+    <!-- Step 2: Argument A -->
+    @if (currentStep === 2) {
+      <div class="step-panel">
+        <div class="step-header">
+          <span class="step-icon side-a-glow">🔵</span>
+          <h2 class="step-title">{{ personForm.get('personA')?.value || 'Challenger A' }}'s take</h2>
+          <p class="step-desc">What's their side of the argument?</p>
+        </div>
+        <form [formGroup]="argumentForm" class="step-body">
+          <div class="editor-wrap editor-wrap-a">
+            <quill-editor
+              formControlName="argumentA"
+              (onEditorChanged)="onArgueA($event)"
+              placeholder="Their argument goes here..."
+            ></quill-editor>
+          </div>
+        </form>
+        <div class="step-nav">
+          <button class="btn-back" (click)="prevStep()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back
+          </button>
+          <button class="btn-next" (click)="nextStep()">
+            Continue
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 3: Argument B -->
+    @if (currentStep === 3) {
+      <div class="step-panel">
+        <div class="step-header">
+          <span class="step-icon side-b-glow">🔴</span>
+          <h2 class="step-title">{{ personForm.get('personB')?.value || 'Challenger B' }}'s take</h2>
+          <p class="step-desc">And what does the other side say?</p>
+        </div>
+        <form [formGroup]="argumentForm" class="step-body">
+          <div class="editor-wrap editor-wrap-b">
+            <quill-editor
+              formControlName="argumentB"
+              (onEditorChanged)="onArgueB($event)"
+              placeholder="Their argument goes here..."
+            ></quill-editor>
+          </div>
+        </form>
+        <div class="step-nav">
+          <button class="btn-back" (click)="prevStep()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back
+          </button>
+          <button class="btn-next" (click)="nextStep()">
+            Continue
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 4: Invite Voters -->
+    @if (currentStep === 4) {
+      <div class="step-panel">
+        <div class="step-header">
+          <span class="step-icon">📲</span>
+          <h2 class="step-title">Rally the jury</h2>
+          <p class="step-desc">Add phone numbers to invite voters via SMS.</p>
+        </div>
+        <form [formGroup]="contactsForm" class="step-body">
+          <div formArrayName="contacts" class="contacts-list">
+            @for (control of contacts.controls; track $index; let last = $last; let first = $first) {
+              <div class="contact-row">
+                <div class="contact-number">
+                  <span class="contact-index">{{ $index + 1 }}</span>
+                  <input
+                    type="text"
+                    [formControlName]="$index"
+                    class="ty-input"
+                    placeholder="Phone number (10 digits)"
+                  />
+                </div>
+                <div class="contact-actions">
+                  @if (last) {
+                    <button type="button" class="icon-btn icon-btn-add" (click)="addPhone()">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                  }
+                  @if (!first && last) {
+                    <button type="button" class="icon-btn icon-btn-remove" (click)="deletePhone($index)">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </button>
+                  }
+                </div>
+              </div>
+              @if (control.errors?.['required'] && control.touched) {
+                <span class="field-error">Phone number is required</span>
+              }
+              @if (control.errors?.['minlength'] || control.errors?.['maxlength']) {
+                <span class="field-error">Must be exactly 10 digits</span>
+              }
+              @if (control.errors?.['pattern']) {
+                <span class="field-error">Only numbers allowed</span>
+              }
+            }
+          </div>
+        </form>
+        <div class="step-nav">
+          <button class="btn-back" (click)="prevStep()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back
+          </button>
+          <button class="btn-submit" (click)="submit()">
+            Settle This
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2L15 22L11 13L2 9L22 2Z"></path></svg>
+          </button>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

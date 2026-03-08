@@ -1,20 +1,49 @@
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { trigger, transition, style, animate, group, query } from '@angular/animations';
 import { Argument } from '../models/argument.model';
 import { ArgumentService } from '../../api/argument.service';
 import { QuillEditorComponent } from 'ngx-quill';
-import { MatStepperModule } from '@angular/material/stepper';
-import { MatInputModule } from '@angular/material/input';
+import { CommonModule } from '@angular/common';
+
+const slideLeft = [
+  query(':enter, :leave', style({ position: 'absolute', width: '100%' }), { optional: true }),
+  group([
+    query(':enter', [
+      style({ transform: 'translateX(80px)', opacity: 0 }),
+      animate('400ms cubic-bezier(0.22, 1, 0.36, 1)', style({ transform: 'translateX(0)', opacity: 1 })),
+    ], { optional: true }),
+    query(':leave', [
+      animate('300ms cubic-bezier(0.22, 1, 0.36, 1)', style({ transform: 'translateX(-80px)', opacity: 0 })),
+    ], { optional: true }),
+  ]),
+];
+
+const slideRight = [
+  query(':enter, :leave', style({ position: 'absolute', width: '100%' }), { optional: true }),
+  group([
+    query(':enter', [
+      style({ transform: 'translateX(-80px)', opacity: 0 }),
+      animate('400ms cubic-bezier(0.22, 1, 0.36, 1)', style({ transform: 'translateX(0)', opacity: 1 })),
+    ], { optional: true }),
+    query(':leave', [
+      animate('300ms cubic-bezier(0.22, 1, 0.36, 1)', style({ transform: 'translateX(80px)', opacity: 0 })),
+    ], { optional: true }),
+  ]),
+];
 
 @Component({
   selector: 'app-argument',
   templateUrl: './argument.component.html',
   styleUrl: './argument.component.scss',
-  imports: [QuillEditorComponent, ReactiveFormsModule, MatCardModule, MatStepperModule, MatInputModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, QuillEditorComponent, ReactiveFormsModule],
+  animations: [
+    trigger('stepAnimation', [
+      transition(':increment', slideLeft),
+      transition(':decrement', slideRight),
+    ]),
+  ],
 })
 export class ArgumentComponent {
   link: string;
@@ -27,6 +56,17 @@ export class ArgumentComponent {
   personB: string;
   argumentA: string;
   argumentB: string;
+
+  currentStep = 0;
+  totalSteps = 5;
+
+  steps = [
+    { label: 'Topic', icon: '💬' },
+    { label: 'Names', icon: '👥' },
+    { label: 'Side A', icon: '🔵' },
+    { label: 'Side B', icon: '🔴' },
+    { label: 'Invite', icon: '📲' },
+  ];
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -56,6 +96,10 @@ export class ArgumentComponent {
     return this.contactsForm.get('contacts') as FormArray;
   }
 
+  get progressWidth(): number {
+    return (this.currentStep / (this.totalSteps - 1)) * 100;
+  }
+
   createContactControl(): FormControl {
     return new FormControl('', [
       Validators.required,
@@ -83,6 +127,35 @@ export class ArgumentComponent {
 
   onArgueB(quill: any) {
     this.argumentB = quill.text;
+  }
+
+  nextStep() {
+    if (this.currentStep < this.totalSteps - 1) {
+      this.currentStep++;
+    }
+  }
+
+  prevStep() {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+    }
+  }
+
+  goToStep(step: number) {
+    if (step <= this.currentStep) {
+      this.currentStep = step;
+    }
+  }
+
+  isStepComplete(step: number): boolean {
+    switch (step) {
+      case 0: return this.topicForm.valid;
+      case 1: return this.personForm.valid;
+      case 2: return !!this.argumentForm.get('argumentA')?.value;
+      case 3: return !!this.argumentForm.get('argumentB')?.value;
+      case 4: return this.contactsForm.valid;
+      default: return false;
+    }
   }
 
   submit() {

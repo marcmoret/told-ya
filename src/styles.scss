@@ -109,28 +109,22 @@ mat-label {
   border: none !important;
 }
 
-.mat-horizontal-stepper-header-container {
-  padding: 8px 0 24px;
-}
-
-.mat-step-icon-selected,
-.mat-step-icon-state-edit {
-  background-color: var(--ty-indigo) !important;
-}
-
 .mat-mdc-form-field {
   width: 100%;
 }
 
 // --- Quill Overrides ---
 .ql-toolbar.ql-snow {
-  border-radius: 12px 12px 0 0;
-  border-color: #e2e8f0;
+  border: none;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 0;
+  padding: 10px 12px;
 }
 
 .ql-container.ql-snow {
-  border-radius: 0 0 12px 12px;
-  border-color: #e2e8f0;
+  border: none;
   min-height: 120px;
   font-family: 'Inter', sans-serif;
+  font-size: 1rem;
 }

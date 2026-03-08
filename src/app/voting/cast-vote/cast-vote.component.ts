@@ -1,7 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Argument } from '../../models/argument.model';
 import { ArgumentService } from '../../../api/argument.service';
 
@@ -9,7 +7,6 @@ import { ArgumentService } from '../../../api/argument.service';
   selector: 'app-cast-vote',
   templateUrl: './cast-vote.component.html',
   styleUrl: './cast-vote.component.scss',
-  imports: [MatButtonModule, MatProgressSpinnerModule],
 })
 export class CastVoteComponent {
   @Input() argument: Argument;

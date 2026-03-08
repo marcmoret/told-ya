@@ -8,12 +8,13 @@
     <h4 class="challenger-name">{{argument?.personA}}</h4>
     <p class="challenger-argument">{{argument?.argumentA}}</p>
     <div class="vote-action">
-      <button class="vote-btn vote-btn-a" (click)="castVote('A')">
-        Vote for {{argument?.personA}}
+      <button class="vote-btn vote-btn-a" (click)="castVote('A')" [disabled]="loadingA">
+        @if (loadingA) {
+          <span class="spinner"></span>
+        } @else {
+          Vote for {{argument?.personA}}
+        }
       </button>
-      @if (loadingA) {
-        <mat-spinner [diameter]="24" class="vote-spinner"></mat-spinner>
-      }
     </div>
   </div>
 
@@ -26,12 +27,13 @@
     <h4 class="challenger-name">{{argument?.personB}}</h4>
     <p class="challenger-argument">{{argument?.argumentB}}</p>
     <div class="vote-action">
-      <button class="vote-btn vote-btn-b" (click)="castVote('B')">
-        Vote for {{argument?.personB}}
+      <button class="vote-btn vote-btn-b" (click)="castVote('B')" [disabled]="loadingB">
+        @if (loadingB) {
+          <span class="spinner"></span>
+        } @else {
+          Vote for {{argument?.personB}}
+        }
       </button>
-      @if (loadingB) {
-        <mat-spinner [diameter]="24" class="vote-spinner"></mat-spinner>
-      }
     </div>
   </div>
 </div>

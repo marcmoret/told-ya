@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { Argument } from '../models/argument.model';
@@ -11,7 +10,7 @@ import { CastVoteComponent } from './cast-vote/cast-vote.component';
   selector: 'app-voting',
   templateUrl: './voting.component.html',
   styleUrl: './voting.component.scss',
-  imports: [MatCardModule, CastVoteComponent],
+  imports: [CastVoteComponent],
 })
 export class VotingComponent implements OnInit {
   argument: Argument;
