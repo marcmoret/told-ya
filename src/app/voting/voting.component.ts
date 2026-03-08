@@ -3,28 +3,29 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute } from '@angular/router';
 import Chart from 'chart.js/auto';
-import { Argument } from 'model/arguement.model';
-import { ArgumentService } from 'src/api/argument.service';
+import { Argument } from '../models/argument.model';
+import { ArgumentService } from '../../api/argument.service';
+import { CastVoteComponent } from './cast-vote/cast-vote.component';
 
 @Component({
   selector: 'app-voting',
   templateUrl: './voting.component.html',
-  styleUrls: ['./voting.component.css'],
-  imports: [MatCardModule],
+  styleUrl: './voting.component.scss',
+  imports: [MatCardModule, CastVoteComponent],
 })
 export class VotingComponent implements OnInit {
   argument: Argument;
   showChart = false;
   docId = '';
   voterId = '';
-  isEligable = true;
+  isEligible = true;
   chart: Chart;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly db: AngularFirestore,
     private readonly argumentService: ArgumentService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const param = this.route.snapshot.paramMap.get('id');
@@ -46,14 +47,14 @@ export class VotingComponent implements OnInit {
 
   verifyVoter() {
     if (this.argument[`voter${this.voterId}`]) {
-      this.isEligable = false;
+      this.isEligible = false;
       this.initChart();
     }
   }
 
   initChart() {
     const ctx = document.getElementById('myChart') as HTMLCanvasElement;
-    if(this.chart){
+    if (this.chart) {
       this.chart.destroy();
     }
     this.chart = new Chart(ctx, {

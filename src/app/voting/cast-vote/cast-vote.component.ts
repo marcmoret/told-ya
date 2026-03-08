@@ -1,19 +1,21 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Argument } from 'model/arguement.model';
-import { ArgumentService } from 'src/api/argument.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Argument } from '../../models/argument.model';
+import { ArgumentService } from '../../../api/argument.service';
 
 @Component({
   selector: 'app-cast-vote',
   templateUrl: './cast-vote.component.html',
-  styleUrls: ['./cast-vote.component.sass'],
+  styleUrl: './cast-vote.component.scss',
+  imports: [MatButtonModule, MatProgressSpinnerModule],
 })
-export class CastVoteComponent implements OnInit {
+export class CastVoteComponent {
   @Input() argument: Argument;
   @Input() docId: string;
   @Input() voterId: string;
-  @Output()
-  castVoted = new EventEmitter();
+  @Output() castVoted = new EventEmitter<boolean>();
 
   loadingA = false;
   loadingB = false;
@@ -23,25 +25,31 @@ export class CastVoteComponent implements OnInit {
     private readonly snackService: MatSnackBar
   ) {}
 
-  ngOnInit(): void {}
-
   async castVote(person: string) {
-    console.log(this.argument);
+    if (person === 'A') {
+      this.loadingA = true;
+    } else {
+      this.loadingB = true;
+    }
 
-    this.argument[`votes${person}`]++;
+    const votesKey = `votes${person}` as 'votesA' | 'votesB';
+    this.argument[votesKey]++;
+    const voteTotal = this.argument[votesKey];
 
-    const voteTotal = this.argument[`votes${person}`];
-    console.log(voteTotal);
-    const result = this.argumentService
+    this.argumentService
       .castVote(this.voterId, voteTotal, this.docId, person)
-      .then((res) => {
+      .then(() => {
         this.snackService.open('Successfully casted vote!', '', {
           duration: 3000,
         });
         this.castVoted.emit(false);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
+        if (person === 'A') {
+          this.loadingA = false;
+        } else {
+          this.loadingB = false;
+        }
       });
   }
 }

@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-head',
   templateUrl: './head.component.html',
-  styleUrls: ['./head.component.scss']
+  styleUrl: './head.component.scss',
+  imports: [RouterModule],
 })
-export class HeadComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+export class HeadComponent {
+  isMenuCollapsed = true;
 }

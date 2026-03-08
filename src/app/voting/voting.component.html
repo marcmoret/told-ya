@@ -1,12 +1,16 @@
-<mat-card style="border: 1px solid grey; height: 100%">
-    <mat-card-content>
-        <h1>Voting Booth</h1>
-        <div [class.display]="isEligable">
-            <canvas id="myChart"></canvas>
-        </div>
-        <div>
-            <app-cast-vote (castVoted)="getArgument()" *ngIf="isEligable" [argument]="argument" [docId]="docId"
-                [voterId]="voterId"></app-cast-vote>
-        </div>
-    </mat-card-content>
+<mat-card class="voting-card glass-card">
+  <mat-card-content>
+    <h1 class="voting-title gradient-text">Voting Booth</h1>
+    <div class="chart-container" [class.chart-hidden]="isEligible">
+      <canvas id="myChart"></canvas>
+    </div>
+    @if (isEligible) {
+      <app-cast-vote
+        (castVoted)="getArgument()"
+        [argument]="argument"
+        [docId]="docId"
+        [voterId]="voterId"
+      ></app-cast-vote>
+    }
+  </mat-card-content>
 </mat-card>

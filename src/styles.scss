@@ -1,9 +1,3 @@
-
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 @use "node_modules/bootstrap/scss/bootstrap";
 
@@ -11,153 +5,132 @@
 @import '~quill/dist/quill.bubble.css';
 @import '~quill/dist/quill.snow.css';
 
-html {
-  @include mat.theme((
-    color: (
-      primary: mat.$cyan-palette,
-      tertiary: mat.$orange-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
+// --- Palette ---
+:root {
+  --ty-indigo: #6366f1;
+  --ty-violet: #8b5cf6;
+  --ty-pink: #ec4899;
+  --ty-coral: #f97316;
+  --ty-teal: #06b6d4;
+  --ty-navy: #0f172a;
+  --ty-navy-light: #1e293b;
+  --ty-slate: #64748b;
+  --ty-blue: rgba(54, 162, 235, 1);
+  --ty-red: rgba(255, 99, 132, 1);
+  --ty-blue-soft: rgba(54, 162, 235, 0.12);
+  --ty-red-soft: rgba(255, 99, 132, 0.12);
+  --ty-gradient: linear-gradient(135deg, var(--ty-indigo), var(--ty-violet), var(--ty-pink));
+  --ty-gradient-btn: linear-gradient(135deg, var(--ty-indigo) 0%, var(--ty-violet) 100%);
+  --ty-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --ty-shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --ty-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
+  --ty-radius: 16px;
 }
 
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
-  margin: 0;
-}
-
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
-
-html {
-  @include mat.theme((
-    color: (
-      primary: mat.$magenta-palette,
-      tertiary: mat.$violet-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
-}
-
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
-  margin: 0;
-}
-
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
-
-html {
-  @include mat.theme((
-    color: (
-      primary: mat.$rose-palette,
-      tertiary: mat.$red-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
-}
-
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
-  margin: 0;
-}
-
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
+// --- Material Theme ---
 html {
   @include mat.theme((
     color: (
       primary: mat.$azure-palette,
       tertiary: mat.$blue-palette,
     ),
-    typography: Roboto,
+    typography: Inter,
     density: 0,
   ));
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #f8fafc;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-/* You can add global styles to this file, and also import other style files */
 
-
-html,
-body {
+html, body {
   height: 100%;
 }
-body {
-  margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+
+// --- Global Utilities ---
+.gradient-text {
+  background: var(--ty-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-gradient {
+  background: var(--ty-gradient-btn);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 36px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    color: #fff;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: var(--ty-radius);
+  box-shadow: var(--ty-shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 mat-label {
-  font-weight: bold;
+  font-weight: 600;
+  color: var(--ty-navy);
 }
 
 .margin {
   margin: 1em;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+// --- Material Overrides ---
+.mat-mdc-card {
+  border-radius: var(--ty-radius) !important;
+  box-shadow: var(--ty-shadow-md) !important;
+  border: none !important;
+}
+
+.mat-horizontal-stepper-header-container {
+  padding: 8px 0 24px;
+}
+
+.mat-step-icon-selected,
+.mat-step-icon-state-edit {
+  background-color: var(--ty-indigo) !important;
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+// --- Quill Overrides ---
+.ql-toolbar.ql-snow {
+  border-radius: 12px 12px 0 0;
+  border-color: #e2e8f0;
+}
+
+.ql-container.ql-snow {
+  border-radius: 0 0 12px 12px;
+  border-color: #e2e8f0;
+  min-height: 120px;
+  font-family: 'Inter', sans-serif;
+}

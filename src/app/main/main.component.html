@@ -1,11 +1,16 @@
-<!-- Full Page Image Header with Vertically Centered Content -->
-<h1 class="font-weight-light">Solve all your arguements right here!</h1>
-
-<button
-  type="button"
-  class="btn btn-secondary btn-lg"
-  [routerLink]="['/argument']"
-  routerLinkActive="router-link-active"
->
-  Let's get started
-</button>
+<div class="hero-content">
+  <p class="hero-eyebrow">The argument ends here</p>
+  <h1 class="hero-title">
+    Settle your <span class="gradient-text">arguments</span> once and for all.
+  </h1>
+  <p class="hero-subtitle">
+    Create a debate, invite your friends to vote, and let the results speak for themselves.
+  </p>
+  <button
+    type="button"
+    class="btn-gradient hero-cta"
+    [routerLink]="['/argument']"
+  >
+    Get Started
+  </button>
+</div>

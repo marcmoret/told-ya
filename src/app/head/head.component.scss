@@ -1,0 +1,60 @@
+.ty-navbar {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 0;
+  transition: background 0.3s ease;
+}
+
+.ty-brand {
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #fff !important;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+
+  .brand-icon {
+    font-size: 1.2rem;
+  }
+}
+
+.ty-toggler {
+  border-color: rgba(255, 255, 255, 0.3);
+
+  .navbar-toggler-icon {
+    filter: invert(1);
+  }
+}
+
+.ty-nav-link {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 8px 16px !important;
+  border-radius: 8px;
+  transition: color 0.2s ease, background 0.2s ease;
+
+  &:hover,
+  &.active {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.ty-nav-cta {
+  background: var(--ty-gradient-btn) !important;
+  color: #fff !important;
+  border-radius: 50px;
+  padding: 8px 20px !important;
+  margin-left: 8px;
+  font-weight: 600;
+
+  &:hover {
+    opacity: 0.9;
+    background: var(--ty-gradient-btn) !important;
+  }
+}

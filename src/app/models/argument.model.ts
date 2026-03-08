@@ -11,4 +11,5 @@ export interface Argument {
   topic: string;
   message: string;
   createdDate: Date;
+  [key: string]: string | number | boolean | Date | Array<string> | undefined;
 }

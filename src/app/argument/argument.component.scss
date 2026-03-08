@@ -1,27 +1,64 @@
-.mat-stepper-horizontal {
-  margin-top: 8px;
+.argument-card {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  border: none;
 }
 
-.mat-form-field {
+.step-content {
+  padding: 24px 0 16px;
+}
+
+.step-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+}
+
+.btn-sm {
+  padding: 10px 28px;
+  font-size: 0.9rem;
+}
+
+.btn-back {
+  color: var(--ty-slate);
+  font-weight: 500;
+}
+
+.challenger-label {
+  margin-bottom: 4px;
+  margin-top: 12px;
+}
+
+.quill-wrap {
+  margin-top: 12px;
+}
+
+.contacts-list {
   margin-top: 16px;
 }
 
-.margin-top {
-  margin-top: 8%;
+.contact-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
-.margin-left {
-  margin-left: 1%;
+.contact-field {
+  flex: 1;
 }
 
-.margin-left-form {
-  margin-left: 15%;
+.contact-actions {
+  display: flex;
+  gap: 4px;
+  padding-top: 8px;
 }
 
-.delete {
-  top: -4 !important;
+.action-add {
+  color: var(--ty-indigo);
 }
 
-.delete-icon {
-  font-size: 20px !important;
+.action-delete {
+  color: var(--ty-red);
 }

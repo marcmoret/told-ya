@@ -1,0 +1,22 @@
+.voting-card {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 32px;
+  border: none;
+}
+
+.voting-title {
+  font-weight: 900;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+}
+
+.chart-container {
+  max-width: 400px;
+  margin: 0 auto 32px;
+}
+
+.chart-hidden {
+  display: none;
+}

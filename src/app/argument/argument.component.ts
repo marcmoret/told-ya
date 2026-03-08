@@ -1,29 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { Argument } from 'model/arguement.model';
-import { ArgumentService } from 'src/api/argument.service';
-import { QuillEditorComponent } from "ngx-quill";
-import { CommonModule } from '@angular/common';
+import { Argument } from '../models/argument.model';
+import { ArgumentService } from '../../api/argument.service';
+import { QuillEditorComponent } from 'ngx-quill';
 import { MatStepperModule } from '@angular/material/stepper';
-import { MatInputModule } from "@angular/material/input";
-
-export class MyTel {
-  constructor(
-    public area: string,
-    public exchange: string,
-    public subscriber: string
-  ) { }
-}
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
-  selector: 'app-arguement',
+  selector: 'app-argument',
   templateUrl: './argument.component.html',
-  styleUrls: ['./argument.component.scss'],
-  imports: [QuillEditorComponent, CommonModule, ReactiveFormsModule, MatCardModule, MatStepperModule, MatInputModule]
+  styleUrl: './argument.component.scss',
+  imports: [QuillEditorComponent, ReactiveFormsModule, MatCardModule, MatStepperModule, MatInputModule, MatButtonModule, MatIconModule],
 })
-export class ArgumentComponent implements OnInit {
+export class ArgumentComponent {
   link: string;
   personForm: FormGroup;
   topicForm: FormGroup;
@@ -32,14 +25,12 @@ export class ArgumentComponent implements OnInit {
   topic: string;
   personA: string;
   personB: string;
-  arguementA: string;
-  arguementB: string;
-
-  Object = Object;
+  argumentA: string;
+  argumentB: string;
 
   constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly arguementService: ArgumentService,
+    private readonly argumentService: ArgumentService,
     private route: Router
   ) {
     this.personForm = this.formBuilder.group({
@@ -57,33 +48,29 @@ export class ArgumentComponent implements OnInit {
     });
 
     this.contactsForm = this.formBuilder.group({
-      contact0: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(10),
-          Validators.minLength(10),
-          Validators.pattern(/^-?(0|[1-9]\d*)?$/),
-        ],
-      ],
+      contacts: this.formBuilder.array([this.createContactControl()]),
     });
   }
 
-  ngOnInit(): void { }
+  get contacts(): FormArray {
+    return this.contactsForm.get('contacts') as FormArray;
+  }
 
-  addPhone(index: number) {
-    this.contactsForm.addControl(`contact${index}`, new FormControl(''));
-    this.contactsForm.controls[`contact${index}`].setValidators([
+  createContactControl(): FormControl {
+    return new FormControl('', [
+      Validators.required,
       Validators.maxLength(10),
       Validators.minLength(10),
-      Validators.required,
       Validators.pattern(/^-?(0|[1-9]\d*)?$/),
     ]);
-    this.contactsForm.controls[`contact${index}`].updateValueAndValidity();
+  }
+
+  addPhone() {
+    this.contacts.push(this.createContactControl());
   }
 
   deletePhone(index: number) {
-    this.contactsForm.removeControl(`contact${index}`);
+    this.contacts.removeAt(index);
   }
 
   onTopicChange(quill: any) {
@@ -91,11 +78,11 @@ export class ArgumentComponent implements OnInit {
   }
 
   onArgueA(quill: any) {
-    this.arguementA = quill.text;
+    this.argumentA = quill.text;
   }
 
   onArgueB(quill: any) {
-    this.arguementB = quill.text;
+    this.argumentB = quill.text;
   }
 
   submit() {
@@ -105,11 +92,10 @@ export class ArgumentComponent implements OnInit {
       this.argumentForm.valid &&
       this.topicForm.valid
     ) {
-      const numbers: string[] = Object.values(this.contactsForm.value);
+      const numbers: string[] = this.contacts.value;
       const personA = this.personForm.get('personA').value;
       const personB = this.personForm.get('personB').value;
 
-      // Quilljs sends the HTML tags so I had to remove the <p> tags.
       const topic = this.topicForm
         .get('topic')
         .value.replace('<p>', '')
@@ -148,7 +134,7 @@ ${personA} and ${personB} need you to settle an argument. Click the link below a
         argument[`voter${i + 1}`] = false;
       });
 
-      this.arguementService.submitArgument(argument).then((id) => {
+      this.argumentService.submitArgument(argument).then((id) => {
         this.route.navigateByUrl(`/argument/${id}0`);
       });
     }
